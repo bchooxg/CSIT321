@@ -2,80 +2,106 @@ package com.example.firstapp
 
 import android.os.Bundle
 import android.util.Log
-import android.widget.Button
 import android.widget.TextView
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
+import com.poovam.pinedittextfield.CirclePinField
+import com.poovam.pinedittextfield.PinField
+
 
 class passwordScreen : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_password_screen)
 
-//        Set the value of text view on first load
-        val tvPassword = findViewById<TextView>(R.id.tvPassChars)
-        val btn1 = findViewById<Button>(R.id.materialButton1)
-        val btn2 = findViewById<Button>(R.id.materialButton2)
-        val btn3 = findViewById<Button>(R.id.materialButton3)
-        val btn4 = findViewById<Button>(R.id.materialButton4)
-        val btn5 = findViewById<Button>(R.id.materialButton5)
-        val btn6 = findViewById<Button>(R.id.materialButton6)
-        val btn7 = findViewById<Button>(R.id.materialButton7)
-        val btn8 = findViewById<Button>(R.id.materialButton8)
-        val btn9 = findViewById<Button>(R.id.materialButton9)
-        val btnDelete = findViewById<Button>(R.id.materialButtonDelete)
-        val buttons = arrayListOf<Button>(btn1, btn2, btn3, btn4, btn5, btn6, btn7, btn8, btn9)
+        /* Function Definition Start */
 
-        fun passcodeChangeHandler(text : String){
-            val currPass = tvPassword.text.toString();
-            // First iter = "----"
-            // Second iter = "●---"
-            var newPassChars = ""
-            var updateFlag = false // Flag to know if character has already been updated
-            for (char in currPass){
-                if(char == '-' && !updateFlag){
-                    newPassChars += "●"
-                    updateFlag = true
-                }else{
-                    newPassChars += char;
+        // check if password in shared preferences is set
+        fun checkPassword(): Boolean {
+            val sharedPref = getSharedPreferences("password", MODE_PRIVATE)
+            val password = sharedPref.getString("password", "0000")
+            return password != "0000"
+        }
+
+        // Set Up Password Flow for First Time flow
+        fun setUpPassword() {
+            var firstPass = ""
+            val circleField = findViewById<CirclePinField>(R.id.circleField)
+            circleField.onTextCompleteListener = object : PinField.OnTextCompleteListener {
+                override fun onTextComplete(enteredText: String): Boolean {
+
+                    // check if first password is set
+                    if (firstPass == "") {
+                        firstPass = enteredText
+                        circleField.setText("")
+                        // edit textview to ask for password again
+                        val textView = findViewById<TextView>(R.id.textView)
+                        textView.text = "Please enter your password again"
+                        return false
+                    }
+
+                    // check if first password and entered password match
+                    if (firstPass != enteredText) {
+                        circleField.setText("")
+                        // edit textview to ask for password again
+                        val textView = findViewById<TextView>(R.id.textView)
+                        textView.text = "Passwords do not match. Please enter your password again"
+                        return false
+                    }
+
+                    // save password to shared preferences
+                    val sharedPref = getSharedPreferences("password", MODE_PRIVATE)
+                    with(sharedPref.edit()) {
+                        putString("password", enteredText)
+                        commit()
+                    }
+
+                    Toast.makeText(this@passwordScreen, "Saved Password", Toast.LENGTH_SHORT).show()
+                    Log.v("password", enteredText)
+
+
+                    return true
                 }
             }
-            Log.v("PASSCODE", newPassChars);
-            tvPassword.text = newPassChars
 
         }
-        fun passcodeDeleteHandler(){
-            val currPass = tvPassword.text.toString();
-            var reversed_newPass = ""
-            var updateFlag = false
-            for (n in currPass.length-1 downTo 0) {
-                if( currPass[n].equals('●') && !updateFlag ){
-                    reversed_newPass += "-"
-                    updateFlag = true
-                }else{
-                    reversed_newPass += currPass[n]
+
+        // Confirm Password Flow
+        fun confirmPassword() {
+            val circleField = findViewById<CirclePinField>(R.id.circleField)
+            circleField.onTextCompleteListener = object : PinField.OnTextCompleteListener {
+                override fun onTextComplete(enteredText: String): Boolean {
+                    // save password to shared preferences
+                    val sharedPref = getSharedPreferences("password", MODE_PRIVATE)
+                    val password = sharedPref.getString("password", "0000")
+                    if (enteredText == password) {
+                        Toast.makeText(this@passwordScreen, "Password Correct", Toast.LENGTH_SHORT).show()
+                        Log.v("password", enteredText)
+                        return true
+                    } else {
+                        Toast.makeText(this@passwordScreen, "Password Incorrect", Toast.LENGTH_SHORT).show()
+                        Log.v("password", enteredText)
+                        return false
+                    }
                 }
             }
-            tvPassword.text = reversed_newPass.reversed();
-
         }
-        for (button in buttons){
-            button.setOnClickListener{
-                val btnValue = button.text.toString()
-                val toast: Toast = Toast.makeText(this, "${btnValue} was tapped", Toast.LENGTH_LONG)
-                passcodeChangeHandler(btnValue)
-                toast.show()
-            }
-        }
-        btnDelete.setOnClickListener{
-            passcodeDeleteHandler()
-        }
+        // Subsequent Flow for Password Entry
 
 
 
 
 
 
+        /* Function Definition END */
+
+        /* Driver Code Start */
+
+        setUpPassword()
+
+
+
+        /* Driver Code END */
 
 
 
