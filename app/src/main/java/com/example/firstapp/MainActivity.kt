@@ -20,5 +20,12 @@ class MainActivity : AppCompatActivity() {
             startActivity(intent)
         }
 
+        val btn2 = findViewById<Button>(R.id.button2);
+        btn2.setOnClickListener {
+            val intent = Intent(this, FileManager::class.java)
+            intent.putExtra("key", "Test")
+            startActivity(intent)
+        }
+
     }
 }
