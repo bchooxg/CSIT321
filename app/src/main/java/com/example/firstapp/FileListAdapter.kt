@@ -7,6 +7,7 @@ import android.text.Layout
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import android.widget.ImageView
+import android.widget.PopupMenu
 import androidx.core.content.ContextCompat.startActivity
 import androidx.recyclerview.widget.RecyclerView
 import java.io.File
@@ -49,6 +50,17 @@ class FileListAdapter(files: Array<File>?, fileList: fileList) : RecyclerView.Ad
                 fileList?.openFile(uri)
 
             }
+        }
+
+        // Set long click listener for each item
+        holder.itemView.setOnLongClickListener {
+            // Show popup menu
+            val popup = PopupMenu(fileList, holder.itemView)
+            popup.menu.add("Delete")
+            popup.menu.add("Move")
+            popup.menu.add("Rename")
+            popup.show()
+            true
         }
 
 
