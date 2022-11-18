@@ -2,15 +2,21 @@ package com.example.firstapp
 
 import android.content.Intent
 import android.net.Uri
+import android.os.Build
 import android.os.Environment
 import android.text.Layout
+import android.util.Log
 import android.view.LayoutInflater
+import android.view.View
 import android.view.ViewGroup
 import android.widget.ImageView
 import android.widget.PopupMenu
+import android.widget.Toast
+import androidx.annotation.RequiresApi
 import androidx.core.content.ContextCompat.startActivity
 import androidx.recyclerview.widget.RecyclerView
 import java.io.File
+import java.nio.file.Files
 
 class FileListAdapter(files: Array<File>?, fileList: fileList) : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
     private var files: Array<File>? = null
@@ -26,6 +32,7 @@ class FileListAdapter(files: Array<File>?, fileList: fileList) : RecyclerView.Ad
         return FileViewHolder(parent, fileList)
     }
 
+    @RequiresApi(Build.VERSION_CODES.O)
     override fun onBindViewHolder(holder: RecyclerView.ViewHolder, position: Int) {
         val file = files!![position]
         (holder as FileViewHolder).bind(file)
@@ -59,6 +66,42 @@ class FileListAdapter(files: Array<File>?, fileList: fileList) : RecyclerView.Ad
             popup.menu.add("Delete")
             popup.menu.add("Move")
             popup.menu.add("Rename")
+
+            popup.setOnMenuItemClickListener { item ->
+                when (item.title) {
+                    "Delete" -> {
+                        // Delete file
+                        // Throw error if file is not deleted
+                        // Check permissions to delete file
+                        Log.v("Can write", file.canWrite().toString())
+                        Log.v("Can Read", file.canRead().toString())
+                        Log.v("Can Execute", file.canExecute().toString())
+
+                        val fileObj = File(file.absolutePath)
+                        if (fileObj.delete()) {
+                            Log.v("File deleted", fileObj.absolutePath)
+                        } else {
+                            Log.v("File not deleted", fileObj.absolutePath)
+                        }
+                        file.delete()
+
+                        true
+                    }
+                    "Move" -> {
+                        // Move file
+                        // Create toast to show that this feature is not implemented
+                        Toast.makeText(fileList, "Move feature is not implemented", Toast.LENGTH_SHORT).show()
+                        true
+                    }
+                    "Rename" -> {
+                        // Rename file
+                        Toast.makeText(fileList, "Rename feature is not implemented", Toast.LENGTH_SHORT).show()
+                        true
+                    }
+                    else -> false
+                }
+            }
+
             popup.show()
             true
         }

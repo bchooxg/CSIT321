@@ -21,7 +21,7 @@ class FileManager : AppCompatActivity() {
 
         // find button
         val btn = findViewById<Button>(R.id.btnCheckPermissions);
-        // set onclick listener and request for permissions if checkpermissions function returns false
+        // set onclick listener and request for permissions if check  permissions function returns false
         btn.setOnClickListener {
             if (!this.checkPermissions()) {
                 this.requestPermissions()
@@ -30,7 +30,7 @@ class FileManager : AppCompatActivity() {
                 Toast.makeText(this, "Permissions already granted", Toast.LENGTH_SHORT).show()
                 // Create intent to go to file list
                 val intent = Intent(this, fileList::class.java)
-                var path = Environment.getExternalStorageDirectory().path
+                val path = Environment.getExternalStorageDirectory().path
                 intent.putExtra("path", path)
                 startActivity(intent)
             }
@@ -39,13 +39,13 @@ class FileManager : AppCompatActivity() {
     }
 
     // Check permission to read and write to external storage
-    fun checkPermissions(): Boolean {
+    private fun checkPermissions(): Boolean {
         val permission = ContextCompat.checkSelfPermission(this, Manifest.permission.WRITE_EXTERNAL_STORAGE)
         return permission == PackageManager.PERMISSION_GRANTED
     }
 
     // Request permission to read and write to external storage
-     fun requestPermissions() {
+    private fun requestPermissions() {
         if (ContextCompat.checkSelfPermission(this, Manifest.permission.WRITE_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED) {
             ActivityCompat.requestPermissions(this, arrayOf(Manifest.permission.WRITE_EXTERNAL_STORAGE), 1)
         }
