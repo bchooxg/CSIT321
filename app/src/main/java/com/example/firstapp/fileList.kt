@@ -1,8 +1,11 @@
 package com.example.firstapp
 
+import android.content.Intent
+import android.net.Uri
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.widget.TextView
+import android.widget.Toast
 import androidx.recyclerview.widget.RecyclerView
 import java.io.File
 
@@ -30,6 +33,25 @@ class fileList : AppCompatActivity() {
         recyclerView.layoutManager = androidx.recyclerview.widget.LinearLayoutManager(this)
         recyclerView.adapter = FileListAdapter(files, this)
         
+    }
+    fun openDirectory(path: String){
+        val intent = Intent(this, fileList::class.java)
+        intent.putExtra("path", path)
+        startActivity(intent)
+    }
+
+    fun openFile(uri: Uri?) {
+
+        try{
+            val intent = Intent(Intent.ACTION_VIEW)
+            var type = "image/*"
+            intent.setDataAndType(uri, type)
+            intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+            startActivity(intent)
+        }catch (e: Exception){
+            // Make toast
+            Toast.makeText(this, "No app found to open this file", Toast.LENGTH_SHORT).show()
+        }
     }
 }
 
