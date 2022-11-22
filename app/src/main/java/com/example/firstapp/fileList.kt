@@ -21,7 +21,7 @@ class fileList : AppCompatActivity() {
         // get path from intent
         val path = intent.getStringExtra("path").toString()
         // Get list of files from path
-        val files = File(path).listFiles()
+        val files = File(path).listFiles()?.toCollection(ArrayList())
         // if there are no files, make textview visible
         if (files != null) {
             if (files.isEmpty()) {
