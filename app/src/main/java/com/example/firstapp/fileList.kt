@@ -24,6 +24,8 @@ import java.io.IOException
 import java.net.URI
 import java.nio.file.Files
 import java.security.Timestamp
+import java.time.LocalDateTime
+import java.time.format.DateTimeFormatter
 import java.util.*
 import kotlin.collections.ArrayList
 
@@ -37,6 +39,7 @@ class fileList : AppCompatActivity() {
         }
     }
 
+    @RequiresApi(Build.VERSION_CODES.O)
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_file_list)
@@ -102,12 +105,11 @@ class fileList : AppCompatActivity() {
     }
 
     fun openFile(uri: Uri?) {
-
+        val intent = Intent(Intent.ACTION_VIEW)
+        var type = "image/*"
+        intent.setDataAndType(uri, type)
+        intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
         try{
-            val intent = Intent(Intent.ACTION_VIEW)
-            var type = "image/*"
-            intent.setDataAndType(uri, type)
-            intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
             startActivity(intent)
         }catch (e: Exception){
             // Make toast
@@ -115,6 +117,7 @@ class fileList : AppCompatActivity() {
         }
     }
 
+    @RequiresApi(Build.VERSION_CODES.O)
     private fun savePhotoToExternalStorage(displayName: String, bitmap: Bitmap, path: String): Boolean {
         val values = ContentValues().apply {
             put(MediaStore.Images.Media.DISPLAY_NAME, displayName)
@@ -122,22 +125,32 @@ class fileList : AppCompatActivity() {
             //put(MediaStore.Images.Media.RELATIVE_PATH, Environment.DIRECTORY_PICTURES)
         }
 
-        val file = File(path, "test.jpg")
-        file.createNewFile()
-        val fout = FileOutputStream(file)
-        bitmap.compress(Bitmap.CompressFormat.JPEG, 85, fout); // saving the Bitmap to a file compressed as a JPEG with 85% compression rate
-        fout.flush();
-        fout.close();
-
-        val resolver = contentResolver
-        val imageUri = resolver.insert(MediaStore.Images.Media.EXTERNAL_CONTENT_URI, values)
-        imageUri?.let { uri ->
-            resolver.openOutputStream(uri).use { stream ->
-                if (!bitmap.compress(Bitmap.CompressFormat.JPEG, 100, stream)) {
-                    throw IOException("Couldn't save bitmap.")
-                }
-            }
+        val formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd-HH:mm:ss")
+        val current = LocalDateTime.now().format(formatter)
+        Log.v("TEST", current)
+        
+        try {
+            val file = File(path, "$current.jpg")
+            file.createNewFile()
+            val fOutStream = FileOutputStream(file)
+            bitmap.compress(
+                Bitmap.CompressFormat.JPEG,
+                85,
+                fOutStream
+            ); // saving the Bitmap to a file compressed as a JPEG with 85% compression rate
+            fOutStream.flush();
+            fOutStream.close();
+        } catch (e: Exception) {
+            e.printStackTrace()
+            Toast.makeText(this, "Error saving photo", Toast.LENGTH_SHORT).show()
+            return false
         }
+        Toast.makeText(this, "Photo saved", Toast.LENGTH_SHORT).show()
+        // Update recycler view
+        val recyclerView = findViewById<RecyclerView>(R.id.rvFilesList)
+        val files = File(path).listFiles()?.toCollection(ArrayList())
+        recyclerView.adapter = FileListAdapter(files, this)
+
         return true
     }
 
