@@ -3,13 +3,16 @@ package com.example.firstapp
 import android.Manifest
 import android.content.Intent
 import android.content.pm.PackageManager
-import androidx.appcompat.app.AppCompatActivity
+import android.net.Uri
+import android.os.Build
 import android.os.Bundle
 import android.os.Environment
 import android.widget.Button
 import android.widget.Toast
+import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
+
 
 class FileManager : AppCompatActivity() {
 
@@ -23,6 +26,17 @@ class FileManager : AppCompatActivity() {
         val btn = findViewById<Button>(R.id.btnCheckPermissions);
         // set onclick listener and request for permissions if check  permissions function returns false
         btn.setOnClickListener {
+
+            if (Build.VERSION.SDK_INT >= 30) {
+                if (!Environment.isExternalStorageManager()) {
+                    val intent = Intent(android.provider.Settings.ACTION_MANAGE_APP_ALL_FILES_ACCESS_PERMISSION)
+                    intent.addCategory("android.intent.category.DEFAULT")
+                    intent.data = Uri.parse(String.format("package:%s", applicationContext.packageName))
+                    startActivity(intent)
+
+                }
+            }
+
             if (!this.checkPermissions()) {
                 this.requestPermissions()
             }else{
