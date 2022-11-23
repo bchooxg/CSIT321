@@ -144,11 +144,26 @@ class FileListAdapter(files: ArrayList<File>?, fileList: fileList) : RecyclerVie
 
         fun bind(file: File) {
             fileName!!.text = file.name
+
+            // get file type
+            val fileType = file.name.substring(file.name.lastIndexOf(".") + 1)
+
             if (file.isDirectory) {
                 fileIcon!!.setImageResource(R.drawable.ic_baseline_folder_24)
-            } else {
+            } else if (fileType == "txt") {
+                fileIcon!!.setImageResource(R.drawable.ic_baseline_insert_drive_file_24)
+            } else if (fileType == "pdf") {
+                fileIcon!!.setImageResource(R.drawable.ic_baseline_picture_as_pdf_24)
+            } else if (fileType == "png" || fileType == "jpg" || fileType == "jpeg") {
+                fileIcon!!.setImageResource(R.drawable.ic_baseline_photo_24)
+            } else if (fileType == "mp4" || fileType == "mkv" || fileType == "avi") {
+                fileIcon!!.setImageResource(R.drawable.ic_baseline_movie_24)
+            } else if (fileType == "mp3" || fileType == "wav") {
+                fileIcon!!.setImageResource(R.drawable.ic_baseline_music_note_24)
+            } else{
                 fileIcon!!.setImageResource(R.drawable.ic_baseline_insert_drive_file_24)
             }
+
             itemView.setOnClickListener {
                 if (file.isDirectory) {
 //                    fileList!!.openFolder(file)

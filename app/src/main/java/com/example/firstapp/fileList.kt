@@ -49,18 +49,10 @@ class fileList : AppCompatActivity() {
         val textView = findViewById<TextView>(R.id.tvNoText);
         val button = findViewById<FloatingActionButton>(R.id.floatingActionButton);
 
-
         // get path from intent
         val path = intent.getStringExtra("path").toString()
         // Get list of files from path
         var files = File(path).listFiles()?.toCollection(ArrayList())
-        // if there are no files, make textview visible
-        if (files != null) {
-            if (files.isEmpty()) {
-                textView.visibility = TextView.VISIBLE
-                return
-            }
-        }
 
         val takePhoto = registerForActivityResult(ActivityResultContracts.TakePicturePreview()) {
             // Do something with the bitmap
@@ -71,6 +63,8 @@ class fileList : AppCompatActivity() {
         // add onclick listener to button
         button.setOnClickListener {
             // show popup menu
+            // make toast
+            Toast.makeText(this, "Button clicked", Toast.LENGTH_SHORT).show()
             val popup = PopupMenu(this, button)
             popup.menu.add("Create New Folder")
             popup.menu.add("Add Photo")
@@ -93,6 +87,19 @@ class fileList : AppCompatActivity() {
                 }
             }
         }
+
+
+        // if there are no files, make textview visible
+        if (files != null) {
+            if (files.isEmpty()) {
+                textView.visibility = TextView.VISIBLE
+                return
+            }
+        }
+
+
+
+
         
         recyclerView.layoutManager = androidx.recyclerview.widget.LinearLayoutManager(this)
         recyclerView.adapter = FileListAdapter(files, this)
