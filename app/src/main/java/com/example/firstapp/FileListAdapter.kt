@@ -4,6 +4,7 @@ import android.content.Intent
 import android.net.Uri
 import android.os.Build
 import android.os.Environment
+import android.provider.MediaStore
 import android.text.Layout
 import android.util.Log
 import android.view.LayoutInflater
@@ -14,6 +15,7 @@ import android.widget.PopupMenu
 import android.widget.Toast
 import androidx.annotation.RequiresApi
 import androidx.core.content.ContextCompat.startActivity
+import androidx.core.net.toUri
 import androidx.recyclerview.widget.RecyclerView
 import java.io.File
 import java.nio.file.Files
@@ -71,6 +73,8 @@ class FileListAdapter(files: ArrayList<File>?, fileList: fileList) : RecyclerVie
             popup.menu.add("Delete")
             popup.menu.add("Move")
             popup.menu.add("Rename")
+            popup.menu.add("Encrypt")
+
             popup.setOnMenuItemClickListener { item ->
                 when (item.title) {
                     "Delete" -> {
@@ -80,12 +84,22 @@ class FileListAdapter(files: ArrayList<File>?, fileList: fileList) : RecyclerVie
                         Log.v("Can Read", file.canRead().toString())
                         Log.v("Can Execute", file.canExecute().toString())
 
-                        val fileObj = File(file.absolutePath)
-                        if (fileObj.delete()) {
-                            Log.v("File deleted", fileObj.absolutePath)
-                        } else {
-                            Log.v("File not deleted", fileObj.absolutePath)
+//                        fileList?.contentResolver?.let { it1 ->
+//                            val uri = file.toUri()
+//                            MediaStore.createDeleteRequest(it1, mutableListOf(uri))
+//                        }
+                        if(file.delete()){
+                            // Hide item
+                            holder.itemView.visibility = View.GONE
+                            // Notify adapter that file is deleted
+//                            notifyItemRemoved(position)
+//                            notifyItemRangeChanged(position, files!!.size)
+                            Toast.makeText(fileList, "File deleted", Toast.LENGTH_SHORT).show()
+
+                        }else{
+                            Toast.makeText(fileList, "File not deleted", Toast.LENGTH_SHORT).show()
                         }
+
                         // Remove item from recyclerview
                         files?.removeAt(position)
 
@@ -102,6 +116,7 @@ class FileListAdapter(files: ArrayList<File>?, fileList: fileList) : RecyclerVie
 
 
 
+
                         true
                     }
                     "Move" -> {
@@ -113,6 +128,22 @@ class FileListAdapter(files: ArrayList<File>?, fileList: fileList) : RecyclerVie
                     "Rename" -> {
                         // Rename file
                         Toast.makeText(fileList, "Rename feature is not implemented", Toast.LENGTH_SHORT).show()
+                        true
+                    }
+                    "Encrypt" -> {
+                        // Encrypt file
+
+                        // Get file extension
+                        var extension = file.extension
+                        // Create new file with .enc extension
+                        var newFile = File(file.absolutePath + ".enc")
+                        // Encrypt file
+                        // Throw error if file is not encrypted
+                        if(file.renameTo(newFile)) {
+                            Toast.makeText(fileList, "File encrypted", Toast.LENGTH_SHORT).show()
+                        }else{
+                            Toast.makeText(fileList, "File not encrypted", Toast.LENGTH_SHORT).show()
+                        }
                         true
                     }
                     else -> false
