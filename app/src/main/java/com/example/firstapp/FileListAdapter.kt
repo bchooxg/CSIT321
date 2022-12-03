@@ -20,8 +20,8 @@ import androidx.recyclerview.widget.RecyclerView
 import java.io.File
 import java.nio.file.Files
 
-class FileListAdapter(files: Array<File>?, fileList: fileList) : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
-    private var files: Array<File>? = null
+class FileListAdapter(files: ArrayList<File>?, fileList: fileList) : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
+    private var files: ArrayList<File>? = null
     private var fileList: fileList? = null
 
     init {
@@ -30,8 +30,13 @@ class FileListAdapter(files: Array<File>?, fileList: fileList) : RecyclerView.Ad
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): RecyclerView.ViewHolder {
-        val view = LayoutInflater.from(parent.context).inflate(R.layout.recycler_item, parent, false)
+        val view =
+            LayoutInflater.from(parent.context).inflate(R.layout.recycler_item, parent, false)
         return FileViewHolder(parent, fileList)
+    }
+
+   fun removeItem(position: Int) {
+
     }
 
     @RequiresApi(Build.VERSION_CODES.O)
@@ -74,7 +79,6 @@ class FileListAdapter(files: Array<File>?, fileList: fileList) : RecyclerView.Ad
                 when (item.title) {
                     "Delete" -> {
                         // Delete file
-                        // Throw error if file is not deleted
                         // Check permissions to delete file
                         Log.v("Can write", file.canWrite().toString())
                         Log.v("Can Read", file.canRead().toString())
@@ -95,6 +99,23 @@ class FileListAdapter(files: Array<File>?, fileList: fileList) : RecyclerView.Ad
                         }else{
                             Toast.makeText(fileList, "File not deleted", Toast.LENGTH_SHORT).show()
                         }
+
+                        // Remove item from recyclerview
+                        files?.removeAt(position)
+
+                        // Update recycler view
+                        Log.v("Position", position.toString())
+                        Log.v("Files", files.toString())
+                        Log.v("Files", files?.size.toString())
+                        notifyItemRemoved(position)
+                        notifyItemRangeChanged(position, this.itemCount)
+                        Log.v("Files", files.toString())
+                        Log.v("Files", files?.size.toString())
+
+
+
+
+
 
                         true
                     }
@@ -154,11 +175,26 @@ class FileListAdapter(files: Array<File>?, fileList: fileList) : RecyclerView.Ad
 
         fun bind(file: File) {
             fileName!!.text = file.name
+
+            // get file type
+            val fileType = file.name.substring(file.name.lastIndexOf(".") + 1)
+
             if (file.isDirectory) {
                 fileIcon!!.setImageResource(R.drawable.ic_baseline_folder_24)
-            } else {
+            } else if (fileType == "txt") {
+                fileIcon!!.setImageResource(R.drawable.ic_baseline_insert_drive_file_24)
+            } else if (fileType == "pdf") {
+                fileIcon!!.setImageResource(R.drawable.ic_baseline_picture_as_pdf_24)
+            } else if (fileType == "png" || fileType == "jpg" || fileType == "jpeg") {
+                fileIcon!!.setImageResource(R.drawable.ic_baseline_photo_24)
+            } else if (fileType == "mp4" || fileType == "mkv" || fileType == "avi") {
+                fileIcon!!.setImageResource(R.drawable.ic_baseline_movie_24)
+            } else if (fileType == "mp3" || fileType == "wav") {
+                fileIcon!!.setImageResource(R.drawable.ic_baseline_music_note_24)
+            } else{
                 fileIcon!!.setImageResource(R.drawable.ic_baseline_insert_drive_file_24)
             }
+
             itemView.setOnClickListener {
                 if (file.isDirectory) {
 //                    fileList!!.openFolder(file)
@@ -167,4 +203,8 @@ class FileListAdapter(files: Array<File>?, fileList: fileList) : RecyclerView.Ad
         }
     }
 
+}
+
+private fun File?.toTypedArray(): Array<File>? {
+    return this?.let { arrayOf(it) }
 }
