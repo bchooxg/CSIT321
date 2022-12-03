@@ -71,6 +71,8 @@ class FileListAdapter(files: ArrayList<File>?, fileList: fileList) : RecyclerVie
             popup.menu.add("Delete")
             popup.menu.add("Move")
             popup.menu.add("Rename")
+            popup.menu.add("Encrypt")
+
             popup.setOnMenuItemClickListener { item ->
                 when (item.title) {
                     "Delete" -> {
@@ -97,8 +99,6 @@ class FileListAdapter(files: ArrayList<File>?, fileList: fileList) : RecyclerVie
                         notifyItemRangeChanged(position, this.itemCount)
                         Log.v("Files", files.toString())
                         Log.v("Files", files?.size.toString())
-
-
 
 
 
@@ -166,11 +166,6 @@ class FileListAdapter(files: ArrayList<File>?, fileList: fileList) : RecyclerVie
                 fileIcon!!.setImageResource(R.drawable.ic_baseline_insert_drive_file_24)
             }
 
-//            itemView.setOnClickListener {
-//                if (file.isDirectory) {
-////                    fileList!!.openFolder(file)
-//                }
-//            }
         }
     }
 
