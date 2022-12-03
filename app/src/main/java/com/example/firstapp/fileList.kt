@@ -12,6 +12,7 @@ import android.os.Bundle
 import android.os.Environment
 import android.provider.MediaStore
 import android.util.Log
+import android.view.View
 import android.widget.*
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.annotation.RequiresApi
@@ -57,14 +58,12 @@ class fileList : AppCompatActivity() {
         val takePhoto = registerForActivityResult(ActivityResultContracts.TakePicturePreview()) {
             // Do something with the bitmap
             savePhotoToExternalStorage(UUID.randomUUID().toString(), it, path)
-            Log.v("TEST", "Photo taken")
         }
 
         // add onclick listener to button
         button.setOnClickListener {
             // show popup menu
             // make toast
-            Toast.makeText(this, "Button clicked", Toast.LENGTH_SHORT).show()
             val popup = PopupMenu(this, button)
             popup.menu.add("Create New Folder")
             popup.menu.add("Add Photo")
@@ -88,22 +87,13 @@ class fileList : AppCompatActivity() {
             }
         }
 
-
-        // if there are no files, make textview visible
-        if (files != null) {
-            if (files.isEmpty()) {
-                textView.visibility = TextView.VISIBLE
-                return
-            }
-        }
-
-
-
-
+        //checkEmpty()
         
         recyclerView.layoutManager = androidx.recyclerview.widget.LinearLayoutManager(this)
-        recyclerView.adapter = FileListAdapter(files, this)
-        
+        refreshRecyclerView()
+//        recyclerView.adapter = FileListAdapter(files, this)
+        // check if there are files in the directory
+
     }
     fun openDirectory(path: String){
         val intent = Intent(this, fileList::class.java)
@@ -132,12 +122,12 @@ class fileList : AppCompatActivity() {
             //put(MediaStore.Images.Media.RELATIVE_PATH, Environment.DIRECTORY_PICTURES)
         }
 
-        val formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd-HH:mm:ss")
+        val formatter = DateTimeFormatter.ofPattern("yyyy_MM_dd_HH_mm_ss")
         val current = LocalDateTime.now().format(formatter)
         Log.v("TEST", current)
         
         try {
-            val file = File(path, "$current.jpg")
+            val file = File(path, "IMG_$current.jpg")
             file.createNewFile()
             val fOutStream = FileOutputStream(file)
             bitmap.compress(
@@ -154,9 +144,10 @@ class fileList : AppCompatActivity() {
         }
         Toast.makeText(this, "Photo saved", Toast.LENGTH_SHORT).show()
         // Update recycler view
-        val recyclerView = findViewById<RecyclerView>(R.id.rvFilesList)
-        val files = File(path).listFiles()?.toCollection(ArrayList())
-        recyclerView.adapter = FileListAdapter(files, this)
+//        val recyclerView = findViewById<RecyclerView>(R.id.rvFilesList)
+//        val files = File(path).listFiles()?.toCollection(ArrayList())
+//        recyclerView.adapter = FileListAdapter(files, this)
+        refreshRecyclerView()
 
         return true
     }
@@ -179,9 +170,10 @@ class fileList : AppCompatActivity() {
                 if(file.mkdir()){
                     Toast.makeText(this@fileList, "Folder created", Toast.LENGTH_SHORT).show()
                     // refresh recyclerview
-                    val recyclerView = findViewById<RecyclerView>(R.id.rvFilesList)
-                    val files = File(path).listFiles()?.toCollection(ArrayList())
-                    recyclerView.adapter = FileListAdapter(files, this@fileList)
+//                    val recyclerView = findViewById<RecyclerView>(R.id.rvFilesList)
+//                    val files = File(path).listFiles()?.toCollection(ArrayList())
+//                    recyclerView.adapter = FileListAdapter(files, this@fileList)
+                    refreshRecyclerView()
 
                 }else{
                     Toast.makeText(this@fileList, "Folder not created", Toast.LENGTH_SHORT).show()
@@ -193,6 +185,35 @@ class fileList : AppCompatActivity() {
             setView(dialogLayout)
             show()
         }
+    }
+
+    fun refreshRecyclerView(){
+        val recyclerView = findViewById<RecyclerView>(R.id.rvFilesList)
+        val path = intent.getStringExtra("path").toString()
+        val files = File(path).listFiles()?.toCollection(ArrayList())
+
+        // check if there are files in the directory
+        val textView = findViewById<TextView>(R.id.tvNoText);
+        if(files?.size == 0) {
+            textView.visibility = TextView.VISIBLE
+        }else{
+            textView.visibility = TextView.INVISIBLE
+        }
+        recyclerView.adapter = FileListAdapter(files, this)
+    }
+
+    fun checkEmpty(){
+        val recyclerView = findViewById<RecyclerView>(R.id.rvFilesList)
+        val textView = findViewById<TextView>(R.id.tvNoText);
+        val path = intent.getStringExtra("path").toString()
+        val files = File(path).listFiles()?.toCollection(ArrayList())
+        if (files != null) {
+            if (files.isEmpty()) {
+                textView.visibility = TextView.VISIBLE
+                return
+            }
+        }
+        textView.visibility = TextView.INVISIBLE
     }
 
 

@@ -102,6 +102,8 @@ class FileListAdapter(files: ArrayList<File>?, fileList: fileList) : RecyclerVie
 
 
 
+
+
                         true
                     }
                     "Move" -> {
@@ -164,11 +166,11 @@ class FileListAdapter(files: ArrayList<File>?, fileList: fileList) : RecyclerVie
                 fileIcon!!.setImageResource(R.drawable.ic_baseline_insert_drive_file_24)
             }
 
-            itemView.setOnClickListener {
-                if (file.isDirectory) {
-//                    fileList!!.openFolder(file)
-                }
-            }
+//            itemView.setOnClickListener {
+//                if (file.isDirectory) {
+////                    fileList!!.openFolder(file)
+//                }
+//            }
         }
     }
 

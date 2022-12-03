@@ -7,11 +7,13 @@ import android.net.Uri
 import android.os.Build
 import android.os.Bundle
 import android.os.Environment
+import android.util.Log
 import android.widget.Button
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
+import java.io.File
 
 
 class FileManager : AppCompatActivity() {
@@ -44,7 +46,19 @@ class FileManager : AppCompatActivity() {
                 Toast.makeText(this, "Permissions already granted", Toast.LENGTH_SHORT).show()
                 // Create intent to go to file list
                 val intent = Intent(this, fileList::class.java)
-                val path = Environment.getExternalStorageDirectory().path
+                var path = Environment.getExternalStorageDirectory().path
+                path += "/Secure Folder"
+                // Check if folder exists
+                val folder = File(path)
+                if (!folder.exists()) {
+                    try{
+                        Log.v("Debug", "Folder not found, attempting to create folder")
+                        folder.mkdir()
+                    }catch (e: Exception){
+                        Toast.makeText(this, "Error creating folder", Toast.LENGTH_SHORT).show()
+                    }
+                }
+                Log.v("Debug", "Folder found, moving to folder")
                 intent.putExtra("path", path)
                 startActivity(intent)
             }
