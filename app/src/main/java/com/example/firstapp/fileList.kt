@@ -1,7 +1,6 @@
 package com.example.firstapp
 
 import android.app.Activity
-import android.app.Dialog
 import android.content.ContentValues
 import android.content.Intent
 import android.graphics.Bitmap
@@ -9,22 +8,25 @@ import android.net.Uri
 import android.os.Build
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
+import android.app.RecoverableSecurityException
+import android.content.ContentResolver
+import android.content.ContentUris
 import android.os.Environment
+import android.provider.CalendarContract.CalendarCache.URI
 import android.provider.MediaStore
 import android.util.Log
-import android.view.View
 import android.widget.*
+import androidx.activity.result.ActivityResultLauncher
+import androidx.activity.result.IntentSenderRequest
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.annotation.RequiresApi
 import androidx.appcompat.app.AlertDialog
+import androidx.core.net.toFile
 import androidx.recyclerview.widget.RecyclerView
 import com.google.android.material.floatingactionbutton.FloatingActionButton
 import java.io.File
 import java.io.FileOutputStream
-import java.io.IOException
 import java.net.URI
-import java.nio.file.Files
-import java.security.Timestamp
 import java.time.LocalDateTime
 import java.time.format.DateTimeFormatter
 import java.util.*
@@ -33,21 +35,133 @@ import kotlin.collections.ArrayList
 class fileList : AppCompatActivity() {
 
     // launcher
-    private val launcher = registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
+    private val fileLauncher = registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
         if (result.resultCode == Activity.RESULT_OK) {
             // Create intent to go to file list
             Log.v("TEST", "File list activity started")
         }
     }
+    private lateinit var intentSenderLauncher: ActivityResultLauncher<IntentSenderRequest>
 
-    @RequiresApi(Build.VERSION_CODES.O)
+    @RequiresApi(Build.VERSION_CODES.R)
+    private val galleryLauncher = registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
+        if (result.resultCode == Activity.RESULT_OK) {
+
+            // Create prompt to tell user about file photo deletion
+            val builder = AlertDialog.Builder(this)
+            builder.setTitle("Move Photo to Secure Folder")
+            builder.setMessage("Moving to secure folder will delete photo from gallery and cannot be undone. Continue?")
+            builder.setPositiveButton("Yes") { dialog, which ->
+
+
+                // Create intent to go to file list
+                Log.v("TEST", "Gallery activity started")
+                // get uri from intent
+                val uri  = result.data?.data
+                Log.v("TEST", "URI: $uri")
+                // get bitmap from uri
+                val bitmap = MediaStore.Images.Media.getBitmap(this.contentResolver, uri)
+                // save bitmap to file
+                saveImage(bitmap)
+
+                // get file path from uri
+                val parentDir = intent.getStringExtra("path").toString()
+                val filePath = uri?.path
+
+                // Get media number from uri
+                val mediaNumber = filePath?.substringAfterLast("/").toString()
+//                val newURI = Uri.parse("content://media/external/images/media/$mediaNumber")
+
+                val newURI = ContentUris.withAppendedId(MediaStore.Images.Media.EXTERNAL_CONTENT_URI, mediaNumber.toLong())
+                Log.v("TEST", "Media Number: $mediaNumber")
+                Log.v("TEST", "New URI: $newURI")
+                // Create delete request to delete photo from gallery
+
+                // Query for the file to be deleted.
+                val queryUri = MediaStore.Files.getContentUri("external")
+                val projection = arrayOf(MediaStore.Files.FileColumns._ID)
+                val selection = "${MediaStore.Files.FileColumns._ID} = ?"
+                val selectionArgs = arrayOf(mediaNumber)
+                val cursor = contentResolver.query(queryUri, projection, selection, selectionArgs, null)
+                cursor?.use {
+                    // Confirm that it exists.
+                    if (it.moveToFirst()) {
+                        // We found the ID. Deleting the item via the content provider will also remove the file.
+                        Log.v("TEST", "File found, Attempting to delete")
+                        val deleteUri = ContentUris.withAppendedId(queryUri, mediaNumber.toLong())
+                        val rows = contentResolver.delete(deleteUri, null, null)
+                        Log.v("TEST", "Rows deleted: $rows")
+                    } else {
+                        // File not found in media store DB
+                        Log.v("TEST", "File not found in media store DB")
+                    }
+                }
+
+
+
+
+                // refresh file list
+                refreshRecyclerView()
+
+            }
+            builder.setNegativeButton("No") { dialog, which ->
+                // close dialog
+                dialog.dismiss()
+            }
+            builder.show()
+        }
+
+    }
+
+
+    @RequiresApi(Build.VERSION_CODES.R)
+    private fun saveImage(bitmap: Bitmap?) {
+        // get current date and time
+        val current = LocalDateTime.now()
+        // format date and time
+        val formatter = DateTimeFormatter.ofPattern("yyyy_MM_dd_HH_mm_ss")
+        val formatted = current.format(formatter)
+        // create file name
+        val fileName = "IMG_$formatted.jpg"
+        // Get filepath from intent
+        val path = intent.getStringExtra("path")
+        // create file
+        val file = File(path, fileName)
+        // create file output stream
+        val fOut = FileOutputStream(file)
+        // compress bitmap to file
+        bitmap?.compress(Bitmap.CompressFormat.JPEG, 100, fOut)
+        // flush file output stream
+        fOut.flush()
+        // close file output stream
+        fOut.close()
+        // add file to media store
+        //MediaStore.Images.Media.insertImage(this.contentResolver, file.absolutePath, file.name, file.name)
+        // refresh media store
+        //this.sendBroadcast(Intent(Intent.ACTION_MEDIA_SCANNER_SCAN_FILE, Uri.fromFile(file)))
+        // make toast
+        Toast.makeText(this, "Image saved", Toast.LENGTH_SHORT).show()
+    }
+
+    @RequiresApi(Build.VERSION_CODES.R)
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_file_list)
 
+//        // Create launcher
+//        intentSenderLauncher = registerForActivityResult(ActivityResultContracts.StartIntentSenderForResult()) {
+//            if(it.resultCode == RESULT_OK) {
+//                if(Build.VERSION.SDK_INT == Build.VERSION_CODES.Q) {
+//                    delete
+//                }
+//                Toast.makeText(this, "Photo deleted successfully", Toast.LENGTH_SHORT).show()
+//            } else {
+//                Toast.makeText(this, "Photo couldn't be deleted", Toast.LENGTH_SHORT).show()
+//            }
+//        }
+
         // get recyclerview
         val recyclerView = findViewById<RecyclerView>(R.id.rvFilesList)
-        val textView = findViewById<TextView>(R.id.tvNoText);
         val button = findViewById<FloatingActionButton>(R.id.floatingActionButton);
 
         // get path from intent
@@ -67,6 +181,7 @@ class fileList : AppCompatActivity() {
             val popup = PopupMenu(this, button)
             popup.menu.add("Create New Folder")
             popup.menu.add("Add Photo")
+            popup.menu.add("Select from gallery")
             popup.show()
 
             popup.setOnMenuItemClickListener {
@@ -82,6 +197,11 @@ class fileList : AppCompatActivity() {
                         takePhoto.launch(null)
                         true
                     }
+                    "Select from gallery" -> {
+                        // Create intent to go to add photo activity
+                        openGalleryIntent()
+                        true
+                    }
                     else -> false
                 }
             }
@@ -95,6 +215,18 @@ class fileList : AppCompatActivity() {
         // check if there are files in the directory
 
     }
+
+    @RequiresApi(Build.VERSION_CODES.R)
+    private fun openGalleryIntent() {
+        // Create intent to go to add photo activity
+        val intent = Intent(Intent.ACTION_PICK)
+        intent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
+        intent.addFlags(Intent.FLAG_GRANT_WRITE_URI_PERMISSION)
+        intent.type = "image/*"
+        galleryLauncher.launch(intent)
+
+    }
+
     fun openDirectory(path: String){
         val intent = Intent(this, fileList::class.java)
         intent.putExtra("path", path)
@@ -200,6 +332,56 @@ class fileList : AppCompatActivity() {
             textView.visibility = TextView.INVISIBLE
         }
         recyclerView.adapter = FileListAdapter(files, this)
+    }
+
+    fun deleteFileFromURI(uri: Uri): Int {
+
+        try{
+            // android 28 and below
+            val rowsDeleted = contentResolver.delete(uri, null, null)
+            Log.v("TEST", "Rows deleted: $rowsDeleted")
+            return rowsDeleted
+        }catch (e : SecurityException){
+            // android 29 (Andriod 10)
+            val intentSender = when {
+                Build.VERSION.SDK_INT >= Build.VERSION_CODES.R -> {
+                    MediaStore.createDeleteRequest(contentResolver, listOf(uri)).intentSender
+                }
+                // android 30 (Andriod 11)
+                Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q -> {
+                    val recoverableSecurityException = e as? RecoverableSecurityException
+                    recoverableSecurityException?.userAction?.actionIntent?.intentSender
+                }
+                else -> null
+            }
+            intentSender?.let { sender ->
+                intentSenderLauncher.launch(
+                    IntentSenderRequest.Builder(sender).build()
+                )
+            }
+        }
+        return 0
+    }
+    private fun deletePhotoFromExternalStorage(photoUri: Uri){
+        try {
+            contentResolver.delete(photoUri, null, null)
+        } catch (e: SecurityException) {
+            val intentSender = when {
+                Build.VERSION.SDK_INT >= Build.VERSION_CODES.R -> {
+                    MediaStore.createDeleteRequest(contentResolver, listOf(photoUri)).intentSender
+                }
+                Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q -> {
+                    val recoverableSecurityException = e as? RecoverableSecurityException
+                    recoverableSecurityException?.userAction?.actionIntent?.intentSender
+                }
+                else -> null
+            }
+            intentSender?.let { sender ->
+                intentSenderLauncher.launch(
+                    IntentSenderRequest.Builder(sender).build()
+                )
+            }
+        }
     }
 
     fun checkEmpty(){
