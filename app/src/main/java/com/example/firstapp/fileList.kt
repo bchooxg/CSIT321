@@ -1,16 +1,13 @@
 package com.example.firstapp
 
 import android.app.Activity
+import android.content.*
+import android.database.Cursor
 import android.graphics.Bitmap
 import android.net.Uri
 import android.os.Build
-import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
-import android.app.RecoverableSecurityException
-import android.content.*
-import android.database.Cursor
 import android.os.Environment
-import android.provider.CalendarContract.CalendarCache.URI
 import android.provider.DocumentsContract
 import android.provider.MediaStore
 import android.util.Log
@@ -20,16 +17,16 @@ import androidx.activity.result.IntentSenderRequest
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.annotation.RequiresApi
 import androidx.appcompat.app.AlertDialog
-import androidx.core.net.toFile
+import androidx.appcompat.app.AppCompatActivity
+import androidx.core.content.FileProvider
 import androidx.recyclerview.widget.RecyclerView
 import com.google.android.material.floatingactionbutton.FloatingActionButton
+import java.io.ByteArrayOutputStream
 import java.io.File
 import java.io.FileOutputStream
-import java.net.URI
 import java.time.LocalDateTime
 import java.time.format.DateTimeFormatter
 import java.util.*
-import kotlin.collections.ArrayList
 
 class fileList : AppCompatActivity() {
 
@@ -93,6 +90,7 @@ class fileList : AppCompatActivity() {
                     Log.v("TEST", "URI: $uri")
                     // get bitmap from uri
                     val bitmap = MediaStore.Images.Media.getBitmap(this.contentResolver, uri)
+                    // Get file path from current intent
                     // save bitmap as image in secure folder and delete from gallery
                     saveImage(bitmap)
                     // delete image from gallery
@@ -130,31 +128,41 @@ class fileList : AppCompatActivity() {
 
     @RequiresApi(Build.VERSION_CODES.R)
     fun saveImage(bitmap: Bitmap?) {
-        // get current date and time
-        val current = LocalDateTime.now()
-        // format date and time
-        val formatter = DateTimeFormatter.ofPattern("yyyy_MM_dd_HH_mm_ss")
-        val formatted = current.format(formatter)
-        // create file name
-        val fileName = "IMG_$formatted.jpg"
+
+        val fileName = generateFileName("IMG_", ".jpg")
+        val encryptedFileName = "E" + fileName
         // Get filepath from intent
         val path = intent.getStringExtra("path")
         // create file
         val file = File(path, fileName)
+        val eFile = File(path, encryptedFileName)
         // create file output stream
         val fOut = FileOutputStream(file)
+        val eFOut = FileOutputStream(eFile)
+
+        // turn bitmap to byte array
+        val byteStream = ByteArrayOutputStream()
+        bitmap?.compress(Bitmap.CompressFormat.JPEG, 100, byteStream)
+        val byteArray: ByteArray = byteStream.toByteArray()
+        // encrypt byte array
+        val cm =  CryptoManager()
+        cm.encrypt(byteArray, eFOut)
+
+
         // compress bitmap to file
         bitmap?.compress(Bitmap.CompressFormat.JPEG, 100, fOut)
         // flush file output stream
         fOut.flush()
+        eFOut.flush()
         // close file output stream
         fOut.close()
-        // add file to media store
-        //MediaStore.Images.Media.insertImage(this.contentResolver, file.absolutePath, file.name, file.name)
-        // refresh media store
-        //this.sendBroadcast(Intent(Intent.ACTION_MEDIA_SCANNER_SCAN_FILE, Uri.fromFile(file)))
+        eFOut.close()
+
+        // todo remove normal file save
+
         // make toast
         Toast.makeText(this, "Image saved", Toast.LENGTH_SHORT).show()
+        refreshRecyclerView()
     }
 
     @RequiresApi(Build.VERSION_CODES.R)
@@ -184,14 +192,33 @@ class fileList : AppCompatActivity() {
         val recyclerView = findViewById<RecyclerView>(R.id.rvFilesList)
         val button = findViewById<FloatingActionButton>(R.id.floatingActionButton);
 
+        // create temp variable to hold temp uri
+        var tempUri: Uri? = null
+
         // get path from intent
         val path = intent.getStringExtra("path").toString()
         // Get list of files from path
         var files = File(path).listFiles()?.toCollection(ArrayList())
 
-        val takePhoto = registerForActivityResult(ActivityResultContracts.TakePicturePreview()) {
-            // Do something with the bitmap
-            savePhotoToExternalStorage(UUID.randomUUID().toString(), it, path)
+        val cameraLauncher = registerForActivityResult(ActivityResultContracts.TakePicture()) {
+            if(it) {
+                // refresh recyclerview
+                Log.v("TEST", "Photo taken ActivityResult return true")
+
+                // Log value of tempUri
+                Log.v("TEST", "TempUri: $tempUri")
+                // get bitmap from uri
+                val bitmap = MediaStore.Images.Media.getBitmap(this.contentResolver, tempUri)
+                // save bitmap as image in secure folder
+                saveImage(bitmap)
+                Log.v("TEST", "Photo saved")
+
+                refreshRecyclerView()
+            }else{
+                Log.v("TEST", "Photo Not Taken ActivityResult return False")
+
+            }
+
         }
 
         // add onclick listener to button
@@ -213,8 +240,8 @@ class fileList : AppCompatActivity() {
                     }
                     "Add Photo" -> {
                         // Create intent to go to add photo activity
-//                        openCameraIntent()
-                        takePhoto.launch(null)
+                        tempUri = initTempUri();
+                        openCameraIntent(cameraLauncher, tempUri!!)
                         true
                     }
                     "Select from gallery" -> {
@@ -247,6 +274,23 @@ class fileList : AppCompatActivity() {
 
     }
 
+    @RequiresApi(Build.VERSION_CODES.O)
+    fun generateFileName(prefix: String, suffix:String):String{
+        val current = LocalDateTime.now()
+        // format date and time
+        val formatter = DateTimeFormatter.ofPattern("yyyy_MM_dd_HH_mm_ss")
+        val formatted = current.format(formatter)
+        return "$prefix$formatted$suffix"
+    }
+
+    @RequiresApi(Build.VERSION_CODES.O)
+    fun openCameraIntent(launcher: ActivityResultLauncher<Uri>, tempUri: Uri) {
+
+
+        launcher.launch(tempUri)
+
+    }
+
     fun openDirectory(path: String) {
         val intent = Intent(this, fileList::class.java)
         intent.putExtra("path", path)
@@ -268,15 +312,10 @@ class fileList : AppCompatActivity() {
 
     @RequiresApi(Build.VERSION_CODES.O)
     private fun savePhotoToExternalStorage(
-        displayName: String,
         bitmap: Bitmap,
         path: String
     ): Boolean {
-        val values = ContentValues().apply {
-            put(MediaStore.Images.Media.DISPLAY_NAME, displayName)
-            put(MediaStore.Images.Media.MIME_TYPE, "image/jpeg")
-            //put(MediaStore.Images.Media.RELATIVE_PATH, Environment.DIRECTORY_PICTURES)
-        }
+
 
         val formatter = DateTimeFormatter.ofPattern("yyyy_MM_dd_HH_mm_ss")
         val current = LocalDateTime.now().format(formatter)
@@ -358,105 +397,34 @@ class fileList : AppCompatActivity() {
         recyclerView.adapter = FileListAdapter(files, this)
     }
 
-    private fun deleteFileFromURI2(uri: Uri) {
-
-        // get absolute path from uri
-        val path = uri.path.toString()
-
-
-        // Query mediastore for file path and delete file
-        val projection = arrayOf(MediaStore.Images.Media.DATA)
-        val cursor = contentResolver.query(uri, projection, null, null, null)
-        cursor?.moveToFirst()
-        val columnIndex = cursor?.getColumnIndex(projection[0])
-        val filePath = cursor?.getString(columnIndex!!)
-        cursor?.close()
-        val file = File(filePath)
-        if (file.delete()) {
-            Toast.makeText(this, "File deleted", Toast.LENGTH_SHORT).show()
-        } else {
-            Toast.makeText(this, "File not deleted", Toast.LENGTH_SHORT).show()
+    private fun getTmpFileUri(): Uri {
+        val tmpFile = File.createTempFile("tmp_image_file", ".png", cacheDir).apply {
+            createNewFile()
+            deleteOnExit()
         }
-    }
 
-    private fun deleteFileFromURI(uri: Uri) {
-
-        try {
-            // android 28 and below
-            val rowsDeleted = contentResolver.delete(uri, null, null)
-            Log.v("TEST", "Rows deleted: $rowsDeleted")
-
-        } catch (e: SecurityException) {
-            // android 29 (Andriod 10)
-
-            // turn provider uri into file uri
-            val newUri = ContentUris.withAppendedId(
-                MediaStore.Images.Media.EXTERNAL_CONTENT_URI,
-                ContentUris.parseId(uri)
-            )
-
-            Log.v("TEST", "New uri: $newUri")
-
-            val intentSender = when {
-                Build.VERSION.SDK_INT >= Build.VERSION_CODES.R -> {
-                    Log.v("TEST", "Android R")
-                    // create list of uri
-                    val uris = listOf(newUri)
-                    Log.v("TEST", "Uris: $uris")
-                    MediaStore.createDeleteRequest(contentResolver, uris).intentSender
-                }
-                // android 30 (Andriod 11)
-                Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q -> {
-                    Log.v("TEST", "Android Q")
-//                    MediaStore.createDeleteRequest(contentResolver, listOf(newUri)).intentSender
-                    val recoverableSecurityException = e as? RecoverableSecurityException
-                    recoverableSecurityException?.userAction?.actionIntent?.intentSender
-                }
-                else -> null
-            }
-            intentSender?.let { sender ->
-                intentSenderLauncher.launch(
-                    IntentSenderRequest.Builder(sender).build()
-                )
-            }
-        }
+        return FileProvider.getUriForFile(applicationContext, "${BuildConfig.APPLICATION_ID}.fileprovider", tmpFile)
     }
 
 
-    private fun deletePhotoFromExternalStorage(photoUri: Uri) {
-        try {
-            contentResolver.delete(photoUri, null, null)
-        } catch (e: SecurityException) {
-            val intentSender = when {
-                Build.VERSION.SDK_INT >= Build.VERSION_CODES.R -> {
-                    MediaStore.createDeleteRequest(contentResolver, listOf(photoUri)).intentSender
-                }
-                Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q -> {
-                    val recoverableSecurityException = e as? RecoverableSecurityException
-                    recoverableSecurityException?.userAction?.actionIntent?.intentSender
-                }
-                else -> null
-            }
-            intentSender?.let { sender ->
-                intentSenderLauncher.launch(
-                    IntentSenderRequest.Builder(sender).build()
-                )
-            }
-        }
-    }
+    private fun initTempUri(): Uri {
+        //gets the temp_images dir
+        val tempImagesDir = File(
+            applicationContext.filesDir, //this function gets the external cache dir
+            getString(R.string.temp_images_dir)) //gets the directory for the temporary images dir
 
-    fun checkEmpty() {
-        val recyclerView = findViewById<RecyclerView>(R.id.rvFilesList)
-        val textView = findViewById<TextView>(R.id.tvNoText);
-        val path = intent.getStringExtra("path").toString()
-        val files = File(path).listFiles()?.toCollection(ArrayList())
-        if (files != null) {
-            if (files.isEmpty()) {
-                textView.visibility = TextView.VISIBLE
-                return
-            }
-        }
-        textView.visibility = TextView.INVISIBLE
+        tempImagesDir.mkdir() //Create the temp_images dir
+
+        //Creates the temp_image.jpg file
+        val tempImage = File(
+            tempImagesDir, //prefix the new abstract path with the temporary images dir path
+            getString(R.string.temp_image)) //gets the abstract temp_image file name
+
+        //Returns the Uri object to be used with ActivityResultLauncher
+        return FileProvider.getUriForFile(
+            applicationContext,
+            getString(R.string.authorities),
+            tempImage)
     }
 
 

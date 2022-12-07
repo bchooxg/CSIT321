@@ -1,4 +1,8 @@
 <resources>
     <string name="app_name">firstApp</string>
     <string name="click_me">Click Me</string>
+    <string name="button_takePicture">Take Picture</string>
+    <string name="temp_images_dir">temp_images</string>
+    <string name="temp_image">temp_image.jpg</string>
+    <string name="authorities">com.example.firstapp.fileprovider</string>
 </resources>
