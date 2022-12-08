@@ -11,6 +11,8 @@ import android.os.Environment
 import android.provider.DocumentsContract
 import android.provider.MediaStore
 import android.util.Log
+import android.view.Menu
+import android.view.MenuItem
 import android.webkit.MimeTypeMap
 import android.widget.*
 import androidx.activity.result.ActivityResultLauncher
@@ -21,14 +23,15 @@ import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.FileProvider
 import androidx.recyclerview.widget.RecyclerView
+import androidx.appcompat.widget.Toolbar
+import androidx.security.crypto.EncryptedFile
 import com.google.android.material.floatingactionbutton.FloatingActionButton
-import java.io.ByteArrayOutputStream
 import java.io.File
-import java.io.FileInputStream
 import java.io.FileOutputStream
 import java.time.LocalDateTime
 import java.time.format.DateTimeFormatter
 import java.util.*
+
 
 class fileList : AppCompatActivity() {
 
@@ -154,6 +157,10 @@ class fileList : AppCompatActivity() {
 //        eFOut.close()
 //
 //        // Encryption Logic END
+        // Encrypt file
+
+
+
 
 
         // compress bitmap to file
@@ -170,10 +177,41 @@ class fileList : AppCompatActivity() {
         refreshRecyclerView()
     }
 
+    // Set up menu for toolbar
+    override fun onCreateOptionsMenu(menu: Menu?): Boolean {
+        menuInflater.inflate(R.menu.appbar_menu, menu)
+        return true
+    }
+
+    // Set up menu item click listener
+    override fun onOptionsItemSelected(item: MenuItem): Boolean {
+        return when (item.itemId) {
+            R.id.ab_option_1 -> {
+                // Create intent to go to settings
+//                val intent = Intent(this, settings::class.java)
+//                startActivity(intent)
+                Toast.makeText(this, "Option 1 Clicked", Toast.LENGTH_SHORT).show()
+                true
+            }
+            R.id.ab_option_2
+            -> {
+                // Create intent to go to about
+//                val intent = Intent(this, about::class.java)
+//                startActivity(intent)
+                Toast.makeText(this, "Option 2 Clicked", Toast.LENGTH_SHORT).show()
+                true
+            }
+            else -> super.onOptionsItemSelected(item)
+        }
+    }
     @RequiresApi(Build.VERSION_CODES.R)
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_file_list)
+
+        val toolbar = findViewById<Toolbar>(R.id.toolbar)
+        setSupportActionBar(toolbar)
+
 
         // Create launcher
         intentSenderLauncher =
@@ -391,6 +429,30 @@ class fileList : AppCompatActivity() {
         recyclerView.adapter = FileListAdapter(files, this)
     }
 
+//    fun encryptFile(file:File){
+//        val masterKey: MasterKey = Builder(context)
+//            .setKeyScheme(MasterKey.KeyScheme.AES256_GCM)
+//            .build()
+//
+//        val file: File = File(context.getFilesDir(), "secret_data")
+//        val encryptedFile = EncryptedFile.Builder(
+//            context,
+//            file,
+//            masterKey,
+//            EncryptedFile.FileEncryptionScheme.AES256_GCM_HKDF_4KB
+//        ).build()
+//
+//        // write to the encrypted file
+//
+//        // write to the encrypted file
+//        val encryptedOutputStream = encryptedFile.openFileOutput()
+//
+//        // read the encrypted file
+//
+//        // read the encrypted file
+//        val encryptedInputStream = encryptedFile.openFileInput()
+//
+//    }
 
     private fun initTempUri(): Uri {
         //gets the temp_images dir

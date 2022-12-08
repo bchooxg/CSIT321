@@ -4,6 +4,9 @@
     android:layout_height="match_parent"
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools">
+    <include
+        android:id="@+id/toolbar"
+        layout="@layout/new_toolbar" />
 
     <TextView
         android:id="@+id/tvNoText"
