@@ -3,6 +3,7 @@ package com.example.firstapp
 import android.os.Build
 import android.security.keystore.KeyGenParameterSpec
 import android.security.keystore.KeyProperties
+import android.util.Log
 import androidx.annotation.RequiresApi
 import java.io.InputStream
 import java.io.OutputStream

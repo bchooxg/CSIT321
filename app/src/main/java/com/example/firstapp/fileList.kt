@@ -11,6 +11,7 @@ import android.os.Environment
 import android.provider.DocumentsContract
 import android.provider.MediaStore
 import android.util.Log
+import android.webkit.MimeTypeMap
 import android.widget.*
 import androidx.activity.result.ActivityResultLauncher
 import androidx.activity.result.IntentSenderRequest
@@ -23,6 +24,7 @@ import androidx.recyclerview.widget.RecyclerView
 import com.google.android.material.floatingactionbutton.FloatingActionButton
 import java.io.ByteArrayOutputStream
 import java.io.File
+import java.io.FileInputStream
 import java.io.FileOutputStream
 import java.time.LocalDateTime
 import java.time.format.DateTimeFormatter
@@ -135,28 +137,31 @@ class fileList : AppCompatActivity() {
         val path = intent.getStringExtra("path")
         // create file
         val file = File(path, fileName)
-        val eFile = File(path, encryptedFileName)
-        // create file output stream
         val fOut = FileOutputStream(file)
-        val eFOut = FileOutputStream(eFile)
 
-        // turn bitmap to byte array
-        val byteStream = ByteArrayOutputStream()
-        bitmap?.compress(Bitmap.CompressFormat.JPEG, 100, byteStream)
-        val byteArray: ByteArray = byteStream.toByteArray()
-        // encrypt byte array
-        val cm =  CryptoManager()
-        cm.encrypt(byteArray, eFOut)
+//        // Encryption Logic START
+//        val eFile = File(path, encryptedFileName)
+//        val eFOut = FileOutputStream(eFile)
+//
+//        // turn bitmap to byte array
+//        val byteStream = ByteArrayOutputStream()
+//        bitmap?.compress(Bitmap.CompressFormat.JPEG, 100, byteStream)
+//        val byteArray: ByteArray = byteStream.toByteArray()
+//        // encrypt byte array
+//        val cm =  CryptoManager()
+//        cm.encrypt(byteArray, eFOut)
+//        eFOut.flush()
+//        eFOut.close()
+//
+//        // Encryption Logic END
 
 
         // compress bitmap to file
         bitmap?.compress(Bitmap.CompressFormat.JPEG, 100, fOut)
         // flush file output stream
         fOut.flush()
-        eFOut.flush()
         // close file output stream
         fOut.close()
-        eFOut.close()
 
         // todo remove normal file save
 
@@ -298,54 +303,43 @@ class fileList : AppCompatActivity() {
     }
 
     fun openFile(uri: Uri?) {
-        val intent = Intent(Intent.ACTION_VIEW)
-        var type = "image/*"
-        intent.setDataAndType(uri, type)
-        intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
-        try {
+        // Check extension of file
+        val extension = MimeTypeMap.getFileExtensionFromUrl(uri.toString())
+        Log.v("TEST", "Extension: $extension")
+        if (extension == "jpg" || extension == "png") {
+
+//            // Decryption Logic Start
+//            // get file from uri
+//            val file = File(uri?.path.toString())
+//            // decrypt byte array
+//            val cm = CryptoManager()
+//            val fis = FileInputStream(file)
+//            val decryptedByteArray = cm.decrypt(fis)
+//
+//            // create temp uri for decrypted file
+//            val tempUri = initTempUri()
+//            val tempFile = tempUri.path?.let { File(it) }
+//            // write decrypted byte array to temp file
+//            tempFile?.writeBytes(decryptedByteArray)
+//            // Decryption Logic End
+
+
+            val intent = Intent(Intent.ACTION_VIEW)
+            intent.setDataAndType(uri, "image/*")
             startActivity(intent)
-        } catch (e: Exception) {
-            // Make toast
-            Toast.makeText(this, "No app found to open this file", Toast.LENGTH_SHORT).show()
         }
+//        val intent = Intent(Intent.ACTION_VIEW)
+//        var type = "image/*"
+//        intent.setDataAndType(uri, type)
+//        intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+//        try {
+//            startActivity(intent)
+//        } catch (e: Exception) {
+//            // Make toast
+//            Toast.makeText(this, "No app found to open this file", Toast.LENGTH_SHORT).show()
+//        }
     }
 
-    @RequiresApi(Build.VERSION_CODES.O)
-    private fun savePhotoToExternalStorage(
-        bitmap: Bitmap,
-        path: String
-    ): Boolean {
-
-
-        val formatter = DateTimeFormatter.ofPattern("yyyy_MM_dd_HH_mm_ss")
-        val current = LocalDateTime.now().format(formatter)
-        Log.v("TEST", current)
-
-        try {
-            val file = File(path, "IMG_$current.jpg")
-            file.createNewFile()
-            val fOutStream = FileOutputStream(file)
-            bitmap.compress(
-                Bitmap.CompressFormat.JPEG,
-                85,
-                fOutStream
-            ); // saving the Bitmap to a file compressed as a JPEG with 85% compression rate
-            fOutStream.flush();
-            fOutStream.close();
-        } catch (e: Exception) {
-            e.printStackTrace()
-            Toast.makeText(this, "Error saving photo", Toast.LENGTH_SHORT).show()
-            return false
-        }
-        Toast.makeText(this, "Photo saved", Toast.LENGTH_SHORT).show()
-        // Update recycler view
-//        val recyclerView = findViewById<RecyclerView>(R.id.rvFilesList)
-//        val files = File(path).listFiles()?.toCollection(ArrayList())
-//        recyclerView.adapter = FileListAdapter(files, this)
-        refreshRecyclerView()
-
-        return true
-    }
 
     fun showCreateFolderDialog() {
 
@@ -395,15 +389,6 @@ class fileList : AppCompatActivity() {
             textView.visibility = TextView.INVISIBLE
         }
         recyclerView.adapter = FileListAdapter(files, this)
-    }
-
-    private fun getTmpFileUri(): Uri {
-        val tmpFile = File.createTempFile("tmp_image_file", ".png", cacheDir).apply {
-            createNewFile()
-            deleteOnExit()
-        }
-
-        return FileProvider.getUriForFile(applicationContext, "${BuildConfig.APPLICATION_ID}.fileprovider", tmpFile)
     }
 
 
