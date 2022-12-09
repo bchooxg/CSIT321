@@ -19,8 +19,8 @@ class passwordScreen : AppCompatActivity() {
         // check if password in shared preferences is set
         fun checkPassword(): Boolean {
             val sharedPref = getSharedPreferences("password", MODE_PRIVATE)
-            val password = sharedPref.getString("password", "0000")
-            return password != "0000"
+            val password = sharedPref.getString("password", "-1")
+            return password != "-1"
         }
 
         // Set Up Password Flow for First Time flow
