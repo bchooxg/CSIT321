@@ -5,10 +5,7 @@ import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.widget.Toast
 import androidx.fragment.app.Fragment
-import com.github.appintro.AppIntro
-import com.github.appintro.AppIntro2
-import com.github.appintro.AppIntroFragment
-import com.github.appintro.AppIntroPageTransformerType
+import com.github.appintro.*
 
 class IntroActivity : AppIntro2() {
 
@@ -16,26 +13,17 @@ class IntroActivity : AppIntro2() {
         super.onCreate(savedInstanceState)
         // Call addSlide passing your Fragments.
         // You can use AppIntroFragment to use a pre-built fragment
-        setTransformer(
-            AppIntroPageTransformerType.Parallax(
-            titleParallaxFactor = 1.0,
-            imageParallaxFactor = -1.0,
-            descriptionParallaxFactor = 2.0
-        ))
+        isWizardMode = true
+//        setTransformer(
+//            AppIntroPageTransformerType.Parallax(
+//            titleParallaxFactor = 1.0,
+//            imageParallaxFactor = -1.0,
+//            descriptionParallaxFactor = 2.0
+//        ))
         setIndicatorColor(
             selectedIndicatorColor = getColor(R.color.proj_select),
             unselectedIndicatorColor = getColor(R.color.prog_unselect)
         )
-
-        // Add permisson checker
-        askForPermissions(
-            permissions = arrayOf(
-                Manifest.permission.READ_EXTERNAL_STORAGE,
-                Manifest.permission.WRITE_EXTERNAL_STORAGE
-            ),
-            slideNumber = 4,
-            required = true)
-
 
 
         // Slide 1
@@ -80,6 +68,8 @@ class IntroActivity : AppIntro2() {
             descriptionTypefaceFontRes = R.font.open_sans,
         ))
         // Slide 5
+        addSlide(CustomSlidePolicyFragment.newInstance())
+        // Slide 6
         addSlide(AppIntroFragment.createInstance(
             title = "Lets get started",
             description =  "You are all ready to use the app",
