@@ -1,39 +1,89 @@
 package com.example.firstapp
 
+import android.Manifest
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
+import android.widget.Toast
 import androidx.fragment.app.Fragment
 import com.github.appintro.AppIntro
+import com.github.appintro.AppIntro2
 import com.github.appintro.AppIntroFragment
 import com.github.appintro.AppIntroPageTransformerType
 
-class IntroActivity : AppIntro() {
+class IntroActivity : AppIntro2() {
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         // Call addSlide passing your Fragments.
         // You can use AppIntroFragment to use a pre-built fragment
-        isColorTransitionsEnabled = true
         setTransformer(
             AppIntroPageTransformerType.Parallax(
             titleParallaxFactor = 1.0,
             imageParallaxFactor = -1.0,
             descriptionParallaxFactor = 2.0
         ))
+        setIndicatorColor(
+            selectedIndicatorColor = getColor(R.color.proj_select),
+            unselectedIndicatorColor = getColor(R.color.prog_unselect)
+        )
 
+        // Add permisson checker
+        askForPermissions(
+            permissions = arrayOf(
+                Manifest.permission.READ_EXTERNAL_STORAGE,
+                Manifest.permission.WRITE_EXTERNAL_STORAGE
+            ),
+            slideNumber = 4,
+            required = true)
+
+
+
+        // Slide 1
         addSlide(
             AppIntroFragment.createInstance(
                 title = "Secure Folder Management",
                 description = "Your one stop shop for all your file management needs",
-                imageDrawable = R.drawable.security,
+                imageDrawable = R.drawable.guy_and_files,
                 titleColorRes = R.color.black,
                 descriptionColorRes = R.color.black,
                 titleTypefaceFontRes = R.font.open_sans,
                 descriptionTypefaceFontRes = R.font.open_sans,
         ))
+        // Slide 2
         addSlide(AppIntroFragment.createInstance(
             title = "Privacy",
             description = "Keep sensitive files hidden on your device ",
+            imageDrawable = R.drawable.privacy,
+            titleColorRes = R.color.black,
+            descriptionColorRes = R.color.black,
+            titleTypefaceFontRes = R.font.open_sans,
+            descriptionTypefaceFontRes = R.font.open_sans,
+        ))
+        // Slide 3
+        addSlide(AppIntroFragment.createInstance(
+            title = "Security",
+            description =  "Pin protect your files for ease of mind",
             imageDrawable = R.drawable.security,
+            titleColorRes = R.color.black,
+            descriptionColorRes = R.color.black,
+            titleTypefaceFontRes = R.font.open_sans,
+            descriptionTypefaceFontRes = R.font.open_sans,
+        ))
+        // Slide 4
+        addSlide(AppIntroFragment.createInstance(
+            title = "But First...",
+            description =  "Our app needs some permissions to work properly",
+            imageDrawable = R.drawable.finger,
+            titleColorRes = R.color.black,
+            descriptionColorRes = R.color.black,
+            titleTypefaceFontRes = R.font.open_sans,
+            descriptionTypefaceFontRes = R.font.open_sans,
+        ))
+        // Slide 5
+        addSlide(AppIntroFragment.createInstance(
+            title = "Lets get started",
+            description =  "You are all ready to use the app",
+            imageDrawable = R.drawable.man_with_box,
             titleColorRes = R.color.black,
             descriptionColorRes = R.color.black,
             titleTypefaceFontRes = R.font.open_sans,
@@ -51,6 +101,15 @@ class IntroActivity : AppIntro() {
         super.onDonePressed(currentFragment)
         // Decide what to do when the user clicks on "Done"
         finish()
+    }
+    override fun onUserDeniedPermission(permissionName: String) {
+        // User pressed "Deny" on the permission dialog
+        Toast.makeText(this, "Deny Clicked", Toast.LENGTH_SHORT).show()
+    }
+    override fun onUserDisabledPermission(permissionName: String) {
+        // User pressed "Deny" + "Don't ask again" on the permission dialog
+        Toast.makeText(this, "Disabled clicked", Toast.LENGTH_SHORT).show()
+
     }
 
 }
