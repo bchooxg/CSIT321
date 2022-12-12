@@ -1,4 +1,4 @@
-package com.example.firstapp
+package com.example.secureFolderManagement
 
 import org.junit.Test
 

@@ -1,4 +1,4 @@
-package com.example.firstapp
+package com.example.secureFolderManagement
 
 import android.app.Activity
 import android.content.*
@@ -24,7 +24,6 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.FileProvider
 import androidx.recyclerview.widget.RecyclerView
 import androidx.appcompat.widget.Toolbar
-import androidx.security.crypto.EncryptedFile
 import com.google.android.material.floatingactionbutton.FloatingActionButton
 import java.io.File
 import java.io.FileOutputStream
@@ -233,7 +232,7 @@ class fileList : AppCompatActivity() {
 
         // get recyclerview
         val recyclerView = findViewById<RecyclerView>(R.id.rvFilesList)
-        val button = findViewById<FloatingActionButton>(R.id.floatingActionButton);
+        val button = findViewById<FloatingActionButton>(R.id.floatingActionButton)
 
         // create temp variable to hold temp uri
         var tempUri: Uri? = null
@@ -283,7 +282,7 @@ class fileList : AppCompatActivity() {
                     }
                     "Add Photo" -> {
                         // Create intent to go to add photo activity
-                        tempUri = initTempUri();
+                        tempUri = initTempUri()
                         openCameraIntent(cameraLauncher, tempUri!!)
                         true
                     }
@@ -420,7 +419,7 @@ class fileList : AppCompatActivity() {
         val files = File(path).listFiles()?.toCollection(ArrayList())
 
         // check if there are files in the directory
-        val textView = findViewById<TextView>(R.id.tvNoText);
+        val textView = findViewById<TextView>(R.id.tvNoText)
         if (files?.size == 0) {
             textView.visibility = TextView.VISIBLE
         } else {

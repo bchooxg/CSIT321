@@ -1,8 +1,8 @@
-package com.example.firstapp
+package com.example.secureFolderManagement
 
-import android.Manifest
-import androidx.appcompat.app.AppCompatActivity
+import android.content.Intent
 import android.os.Bundle
+import android.os.Environment
 import android.widget.Toast
 import androidx.fragment.app.Fragment
 import com.github.appintro.*
@@ -79,6 +79,9 @@ class IntroActivity : AppIntro2() {
             titleTypefaceFontRes = R.font.open_sans,
             descriptionTypefaceFontRes = R.font.open_sans,
         ))
+        // Passed all slides moving to file list
+
+
     }
 
     override fun onSkipPressed(currentFragment: Fragment?) {
@@ -90,6 +93,12 @@ class IntroActivity : AppIntro2() {
     override fun onDonePressed(currentFragment: Fragment?) {
         super.onDonePressed(currentFragment)
         // Decide what to do when the user clicks on "Done"
+        val intent = Intent(this, fileList::class.java)
+        var path = Environment.getExternalStorageDirectory().path
+        path += "/" + resources.getString(R.string.folderName)
+        updateOnboardingFlag()
+        intent.putExtra("path", path)
+        startActivity(intent)
         finish()
     }
     override fun onUserDeniedPermission(permissionName: String) {
@@ -100,6 +109,14 @@ class IntroActivity : AppIntro2() {
         // User pressed "Deny" + "Don't ask again" on the permission dialog
         Toast.makeText(this, "Disabled clicked", Toast.LENGTH_SHORT).show()
 
+    }
+
+    private fun updateOnboardingFlag() {
+        val sharedPref = getSharedPreferences(resources.getString(R.string.shared_prefs), MODE_PRIVATE)
+        with(sharedPref.edit()) {
+            putBoolean("completedOnboarding", true)
+            apply()
+        }
     }
 
 }

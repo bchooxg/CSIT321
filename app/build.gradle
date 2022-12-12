@@ -7,7 +7,7 @@ android {
     compileSdk 32
 
     defaultConfig {
-        applicationId "com.example.firstapp"
+        applicationId "com.example.secureFolderManagement"
         minSdk 23
         targetSdk 32
         versionCode 1

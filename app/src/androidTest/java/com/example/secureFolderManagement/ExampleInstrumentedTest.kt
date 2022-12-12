@@ -1,4 +1,4 @@
-package com.example.firstapp
+package com.example.secureFolderManagement
 
 import androidx.test.platform.app.InstrumentationRegistry
 import androidx.test.ext.junit.runners.AndroidJUnit4

@@ -1,6 +1,5 @@
-package com.example.firstapp
+package com.example.secureFolderManagement
 
-import android.content.Context
 import android.content.SharedPreferences
 
 class PreferenceManager(sp: SharedPreferences){

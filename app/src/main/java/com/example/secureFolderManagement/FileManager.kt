@@ -1,4 +1,4 @@
-package com.example.firstapp
+package com.example.secureFolderManagement
 
 import android.Manifest
 import android.content.Intent
@@ -29,7 +29,7 @@ class FileManager : AppCompatActivity() {
         setContentView(R.layout.activity_file_manager)
 
         // find button
-        val btn = findViewById<Button>(R.id.btnCheckPermissions);
+        val btn = findViewById<Button>(R.id.btnCheckPermissions)
         // set onclick listener and request for permissions if check  permissions function returns false
         btn.setOnClickListener {
 

@@ -1,9 +1,8 @@
-package com.example.firstapp
+package com.example.secureFolderManagement
 
 import android.os.Build
 import android.security.keystore.KeyGenParameterSpec
 import android.security.keystore.KeyProperties
-import android.util.Log
 import androidx.annotation.RequiresApi
 import java.io.InputStream
 import java.io.OutputStream

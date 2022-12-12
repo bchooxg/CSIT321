@@ -1,4 +1,4 @@
-package com.example.firstapp
+package com.example.secureFolderManagement
 
 import android.content.Context
 import android.content.Intent
@@ -24,26 +24,26 @@ class MainActivity : AppCompatActivity() {
         val sharedPreferences = getSharedPreferences("com.example.firstapp", Context.MODE_PRIVATE)
         val preferenceManager = PreferenceManager(sharedPreferences)
         val username = preferenceManager.checkUsername()
-        Log.v("MainActivity", "Username: $username")
+        Log.v("TEST", "Username: $username")
 
 
         // Add logic
 
-        val btn = findViewById<Button>(R.id.button);
+        val btn = findViewById<Button>(R.id.button)
         btn.setOnClickListener {
             val intent = Intent(this, passwordScreen::class.java)
             intent.putExtra("key", "Test")
             startActivity(intent)
         }
 
-        val btn2 = findViewById<Button>(R.id.button2);
+        val btn2 = findViewById<Button>(R.id.button2)
         btn2.setOnClickListener {
             val intent = Intent(this, FileManager::class.java)
             intent.putExtra("key", "Test")
             startActivity(intent)
         }
         
-        val btn3 = findViewById<Button>(R.id.button3);
+        val btn3 = findViewById<Button>(R.id.button3)
         btn3.setOnClickListener {
             val intent = Intent(this, IntroActivity::class.java)
             intent.putExtra("key", "Test")
