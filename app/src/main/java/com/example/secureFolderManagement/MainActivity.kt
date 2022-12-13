@@ -17,8 +17,6 @@ class MainActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
 
-        val toolbar = findViewById<Toolbar>(R.id.toolbar)
-        setSupportActionBar(toolbar)
 
         // Set up shared preferences
         val sharedPreferences = getSharedPreferences("com.example.firstapp", Context.MODE_PRIVATE)
@@ -52,6 +50,13 @@ class MainActivity : AppCompatActivity() {
         val btn4 = findViewById<Button>(R.id.button4)
         btn4.setOnClickListener {
             val intent = Intent(this, loginActivity::class.java)
+            intent.putExtra("key", "Test")
+            startActivity(intent)
+        }
+
+        val btn5 = findViewById<Button>(R.id.button5)
+        btn5.setOnClickListener {
+            val intent = Intent(this, SettingsActivity::class.java)
             intent.putExtra("key", "Test")
             startActivity(intent)
         }
