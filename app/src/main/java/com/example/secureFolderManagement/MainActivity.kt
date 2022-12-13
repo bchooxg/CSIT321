@@ -4,6 +4,7 @@ import android.content.Context
 import android.content.Intent
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
+import android.os.Environment
 import android.util.Log
 import android.view.Menu
 import android.widget.Button
@@ -19,11 +20,38 @@ class MainActivity : AppCompatActivity() {
 
 
         // Set up shared preferences
-        val sharedPreferences = getSharedPreferences("com.example.firstapp", Context.MODE_PRIVATE)
+        val sharedPreferences = getSharedPreferences(resources.getString(R.string.shared_prefs), Context.MODE_PRIVATE)
         val preferenceManager = PreferenceManager(sharedPreferences)
         val username = preferenceManager.checkUsername()
         Log.v("TEST", "Username: $username")
+        val auth = preferenceManager.checkAuth()
+        val onboarding = preferenceManager.checkOnboarding()
+        val isPinSet = preferenceManager.checkPINflag()
+        Log.v("TEST", "Auth: $auth, Onboarding: $onboarding, isPinSet: $isPinSet")
 
+        // Direct the user to diff activities based on flags in shared prefs
+
+//        if (!auth){
+//            val intent = Intent(this, loginActivity::class.java)
+//            startActivity(intent)
+//        }
+        if (!onboarding) {
+            val intent = Intent(this, IntroActivity::class.java)
+            startActivity(intent)
+        }
+
+        if(!isPinSet){
+            val intent = Intent(this, passwordScreen::class.java)
+            startActivity(intent)
+        }
+
+        val intent = Intent(this, fileList::class.java)
+        var path = Environment.getExternalStorageDirectory().path
+        // Appending folder name to path
+        path += "/" + resources.getString(R.string.folderName)
+        intent.putExtra("path", path)
+        Log.v("TEST", "Path: $path")
+        startActivity(intent)
 
         // Add logic
 

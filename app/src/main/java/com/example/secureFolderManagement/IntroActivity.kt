@@ -114,7 +114,7 @@ class IntroActivity : AppIntro2() {
     private fun updateOnboardingFlag() {
         val sharedPref = getSharedPreferences(resources.getString(R.string.shared_prefs), MODE_PRIVATE)
         with(sharedPref.edit()) {
-            putBoolean("completedOnboarding", true)
+            putBoolean("isOnboarded", true)
             apply()
         }
     }

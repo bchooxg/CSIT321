@@ -1,6 +1,8 @@
 package com.example.secureFolderManagement
 
+import android.content.Intent
 import android.os.Bundle
+import android.os.Environment
 import android.util.Log
 import android.widget.TextView
 import android.widget.Toast
@@ -16,12 +18,6 @@ class passwordScreen : AppCompatActivity() {
 
         /* Function Definition Start */
 
-        // check if password in shared preferences is set
-        fun checkPassword(): Boolean {
-            val sharedPref = getSharedPreferences("password", MODE_PRIVATE)
-            val password = sharedPref.getString("password", "-1")
-            return password != "-1"
-        }
 
         // Set Up Password Flow for First Time flow
         fun setUpPassword() {
@@ -50,15 +46,22 @@ class passwordScreen : AppCompatActivity() {
                     }
 
                     // save password to shared preferences
-                    val sharedPref = getSharedPreferences("password", MODE_PRIVATE)
+                    val sharedPref = getSharedPreferences(resources.getString(R.string.shared_prefs), MODE_PRIVATE)
                     with(sharedPref.edit()) {
-                        putString("password", enteredText)
+                        putString("PIN", enteredText)
+                        putBoolean("isPinSet", true)
                         commit()
                     }
 
+
                     Toast.makeText(this@passwordScreen, "Saved Password", Toast.LENGTH_SHORT).show()
                     Log.v("password", enteredText)
-
+                    val intent = Intent(this@passwordScreen, fileList::class.java)
+                    var path = Environment.getExternalStorageDirectory().path
+                    // Appending folder name to path
+                    path += "/"+resources.getString(R.string.folderName)
+                    intent.putExtra("path", path)
+                    startActivity(intent)
 
                     return true
                 }
@@ -67,14 +70,12 @@ class passwordScreen : AppCompatActivity() {
         }
 
         // Confirm Password Flow
-        fun confirmPassword() {
+        fun confirmPassword(pin: String) {
             val circleField = findViewById<CirclePinField>(R.id.circleField)
             circleField.onTextCompleteListener = object : PinField.OnTextCompleteListener {
                 override fun onTextComplete(enteredText: String): Boolean {
                     // save password to shared preferences
-                    val sharedPref = getSharedPreferences("password", MODE_PRIVATE)
-                    val password = sharedPref.getString("password", "0000")
-                    if (enteredText == password) {
+                    if (enteredText == pin) {
                         Toast.makeText(this@passwordScreen, "Password Correct", Toast.LENGTH_SHORT).show()
                         Log.v("password", enteredText)
                         return true
@@ -97,7 +98,16 @@ class passwordScreen : AppCompatActivity() {
 
         /* Driver Code Start */
 
-        setUpPassword()
+        // check if password is set
+        val sp = getSharedPreferences(resources.getString(R.string.shared_prefs), MODE_PRIVATE)
+        val isPinSet = PreferenceManager(sp).checkPINflag()
+        val pin = PreferenceManager(sp).getPIN()
+
+        if(!isPinSet) {
+            setUpPassword()
+        } else {
+            confirmPassword(pin)
+        }
 
 
 
