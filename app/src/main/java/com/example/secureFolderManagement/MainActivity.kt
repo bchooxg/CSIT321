@@ -49,6 +49,12 @@ class MainActivity : AppCompatActivity() {
             intent.putExtra("key", "Test")
             startActivity(intent)
         }
+        val btn4 = findViewById<Button>(R.id.button4)
+        btn4.setOnClickListener {
+            val intent = Intent(this, loginActivity::class.java)
+            intent.putExtra("key", "Test")
+            startActivity(intent)
+        }
 
     }
 
