@@ -31,27 +31,26 @@ class MainActivity : AppCompatActivity() {
 
         // Direct the user to diff activities based on flags in shared prefs
 
-//        if (!auth){
-//            val intent = Intent(this, loginActivity::class.java)
-//            startActivity(intent)
-//        }
+        if (!auth){
+            val intent = Intent(this, loginActivity::class.java)
+            return startActivity(intent)
+        }
         if (!onboarding) {
             val intent = Intent(this, IntroActivity::class.java)
             startActivity(intent)
         }
 
-        if(!isPinSet){
-            val intent = Intent(this, passwordScreen::class.java)
-            startActivity(intent)
-        }
-
-        val intent = Intent(this, fileList::class.java)
-        var path = Environment.getExternalStorageDirectory().path
-        // Appending folder name to path
-        path += "/" + resources.getString(R.string.folderName)
-        intent.putExtra("path", path)
-        Log.v("TEST", "Path: $path")
+        // Go to pin code activity
+        val intent = Intent(this, passwordScreen::class.java)
         startActivity(intent)
+
+//        val intent = Intent(this, fileList::class.java)
+//        var path = Environment.getExternalStorageDirectory().path
+//        // Appending folder name to path
+//        path += "/" + resources.getString(R.string.folderName)
+//        intent.putExtra("path", path)
+//        Log.v("TEST", "Path: $path")
+//        startActivity(intent)
 
         // Add logic
 

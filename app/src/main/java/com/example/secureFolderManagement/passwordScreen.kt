@@ -12,6 +12,16 @@ import com.poovam.pinedittextfield.PinField
 
 
 class passwordScreen : AppCompatActivity() {
+
+    fun toFileManagerActivity(){
+        val intent = Intent(this@passwordScreen, fileList::class.java)
+        var path = Environment.getExternalStorageDirectory().path
+        // Appending folder name to path
+        path += "/"+resources.getString(R.string.folderName)
+        intent.putExtra("path", path)
+        return startActivity(intent)
+    }
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_password_screen)
@@ -31,7 +41,7 @@ class passwordScreen : AppCompatActivity() {
                         firstPass = enteredText
                         circleField.setText("")
                         // edit textview to ask for password again
-                        val textView = findViewById<TextView>(R.id.textView)
+                        val textView = findViewById<TextView>(R.id.tv_pinScreen)
                         textView.text = "Please enter your password again"
                         return false
                     }
@@ -40,7 +50,7 @@ class passwordScreen : AppCompatActivity() {
                     if (firstPass != enteredText) {
                         circleField.setText("")
                         // edit textview to ask for password again
-                        val textView = findViewById<TextView>(R.id.textView)
+                        val textView = findViewById<TextView>(R.id.tv_pinScreen)
                         textView.text = "Passwords do not match. Please enter your password again"
                         return false
                     }
@@ -56,12 +66,7 @@ class passwordScreen : AppCompatActivity() {
 
                     Toast.makeText(this@passwordScreen, "Saved Password", Toast.LENGTH_SHORT).show()
                     Log.v("password", enteredText)
-                    val intent = Intent(this@passwordScreen, fileList::class.java)
-                    var path = Environment.getExternalStorageDirectory().path
-                    // Appending folder name to path
-                    path += "/"+resources.getString(R.string.folderName)
-                    intent.putExtra("path", path)
-                    startActivity(intent)
+                    toFileManagerActivity();
 
                     return true
                 }
@@ -72,12 +77,15 @@ class passwordScreen : AppCompatActivity() {
         // Confirm Password Flow
         fun confirmPassword(pin: String) {
             val circleField = findViewById<CirclePinField>(R.id.circleField)
+            val tv = findViewById<TextView>(R.id.tv_pinScreen)
+            tv.text = "Please enter your password"
             circleField.onTextCompleteListener = object : PinField.OnTextCompleteListener {
                 override fun onTextComplete(enteredText: String): Boolean {
                     // save password to shared preferences
                     if (enteredText == pin) {
                         Toast.makeText(this@passwordScreen, "Password Correct", Toast.LENGTH_SHORT).show()
                         Log.v("password", enteredText)
+                        toFileManagerActivity();
                         return true
                     } else {
                         Toast.makeText(this@passwordScreen, "Password Incorrect", Toast.LENGTH_SHORT).show()
@@ -88,8 +96,6 @@ class passwordScreen : AppCompatActivity() {
             }
         }
         // Subsequent Flow for Password Entry
-
-
 
 
 

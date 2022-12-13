@@ -24,8 +24,15 @@ class PreferenceManager(sp: SharedPreferences){
         }
         return true
     }
-    fun setAuth() {
+
+    fun unsetAuth() {
+        sharedPref.edit().putBoolean("isAuth", false).apply()
+        sharedPref.edit().remove("username").apply()
+    }
+
+    fun setAuth(username: String) {
         sharedPref.edit().putBoolean("isAuth", true).apply()
+        sharedPref.edit().putString("username", username).apply()
     }
 
     fun checkPINflag(): Boolean {
