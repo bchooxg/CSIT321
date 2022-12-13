@@ -6,22 +6,40 @@ class PreferenceManager(sp: SharedPreferences){
 
     private val sharedPref: SharedPreferences = sp
 
-    fun checkFirstTime(): Boolean {
-        if (!sharedPref.getBoolean("firstTime", false)) {
-            setFirstTime()
+
+
+    fun checkOnboarding(): Boolean {
+        if (!sharedPref.getBoolean("isOnboarded", false)) {
             return false
         }
         return true
     }
-    fun setFirstTime() {
-        sharedPref.edit().putBoolean("firstTime", true).apply()
+    fun setOnboarding() {
+        sharedPref.edit().putBoolean("isOnboarded", true).apply()
+    }
+
+    fun checkAuth(): Boolean {
+        if (!sharedPref.getBoolean("isAuth", false)) {
+            return false
+        }
+        return true
+    }
+
+    fun unsetAuth() {
+        sharedPref.edit().putBoolean("isAuth", false).apply()
+        sharedPref.edit().remove("username").apply()
+    }
+
+    fun setAuth(username: String) {
+        sharedPref.edit().putBoolean("isAuth", true).apply()
+        sharedPref.edit().putString("username", username).apply()
     }
 
     fun checkPINflag(): Boolean {
-        return sharedPref.getBoolean("hasPIN", false)
+        return sharedPref.getBoolean("isPinSet", false)
     }
-    fun setPINflag() {
-        sharedPref.edit().putBoolean("hasPIN", true).apply()
+    fun setPINflag(boolean: Boolean) {
+        sharedPref.edit().putBoolean("isPinSet", boolean).apply()
     }
 
     fun getPIN(): String {
@@ -35,7 +53,7 @@ class PreferenceManager(sp: SharedPreferences){
         return sharedPref.getString("username", "")
     }
 
-    fun writeUsername(username: String){
+    fun setUsername(username: String){
         val editor = sharedPref.edit()
         editor.putString("username", username)
         editor.apply()

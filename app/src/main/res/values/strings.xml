@@ -7,6 +7,7 @@
     <string name="temp_image">temp_image.jpg</string>
     <string name="authorities">com.example.secureFolderManagement.fileprovider</string>
     <string name="title_activity_intro">IntroActivity</string>
+    <string name="server_url">https://secure-folder-webservice.onrender.com</string>
     <!-- Strings used for fragments for navigation -->
     <string name="first_fragment_label">First Fragment</string>
     <string name="second_fragment_label">Second Fragment</string>

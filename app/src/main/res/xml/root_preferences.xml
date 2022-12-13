@@ -1,0 +1,26 @@
+<PreferenceScreen xmlns:app="http://schemas.android.com/apk/res-auto">
+
+    <PreferenceCategory app:title="Current Password">
+
+        <EditTextPreference
+            app:key="password"
+            app:title="Password"
+            app:useSimpleSummaryProvider="true" />
+
+    </PreferenceCategory>
+
+    <PreferenceCategory app:title="Passwords Settings">
+
+        <SwitchPreferenceCompat
+            app:key="changePwd"
+            app:title="Request to change password every 6 months" />
+
+        <SwitchPreferenceCompat
+            app:key="lockAcc"
+            app:summaryOff="Take note that your account will be locked and no access will not be available"
+            app:summaryOn="Take note that your account will be unlocked"
+            app:title="Lock Account" />
+
+    </PreferenceCategory>
+
+</PreferenceScreen>

@@ -13,6 +13,7 @@ import android.provider.MediaStore
 import android.util.Log
 import android.view.Menu
 import android.view.MenuItem
+import android.view.View
 import android.webkit.MimeTypeMap
 import android.widget.*
 import androidx.activity.result.ActivityResultLauncher
@@ -185,14 +186,16 @@ class fileList : AppCompatActivity() {
     // Set up menu item click listener
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
         return when (item.itemId) {
-            R.id.ab_option_1 -> {
+            R.id.ab_option_settings -> {
                 // Create intent to go to settings
 //                val intent = Intent(this, settings::class.java)
 //                startActivity(intent)
                 Toast.makeText(this, "Option 1 Clicked", Toast.LENGTH_SHORT).show()
+                val intent = Intent(this, SettingsActivity::class.java)
+                startActivity(intent)
                 true
             }
-            R.id.ab_option_2
+            R.id.ab_option_logOut
             -> {
                 // Create intent to go to about
 //                val intent = Intent(this, about::class.java)
@@ -208,8 +211,10 @@ class fileList : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_file_list)
 
+        // Set up action bar and actions
         val toolbar = findViewById<Toolbar>(R.id.toolbar)
         setSupportActionBar(toolbar)
+
 
 
         // Create launcher

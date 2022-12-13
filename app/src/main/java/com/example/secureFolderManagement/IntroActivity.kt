@@ -93,11 +93,12 @@ class IntroActivity : AppIntro2() {
     override fun onDonePressed(currentFragment: Fragment?) {
         super.onDonePressed(currentFragment)
         // Decide what to do when the user clicks on "Done"
-        val intent = Intent(this, fileList::class.java)
-        var path = Environment.getExternalStorageDirectory().path
-        path += "/" + resources.getString(R.string.folderName)
+//        val intent = Intent(this, fileList::class.java)
+//        var path = Environment.getExternalStorageDirectory().path
+//        path += "/" + resources.getString(R.string.folderName)
+//        intent.putExtra("path", path)
         updateOnboardingFlag()
-        intent.putExtra("path", path)
+        val intent = Intent(this, MainActivity::class.java)
         startActivity(intent)
         finish()
     }
@@ -114,7 +115,7 @@ class IntroActivity : AppIntro2() {
     private fun updateOnboardingFlag() {
         val sharedPref = getSharedPreferences(resources.getString(R.string.shared_prefs), MODE_PRIVATE)
         with(sharedPref.edit()) {
-            putBoolean("completedOnboarding", true)
+            putBoolean("isOnboarded", true)
             apply()
         }
     }
