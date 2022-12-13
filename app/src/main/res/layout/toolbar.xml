@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="?attr/actionBarSize"
+    android:background="?colorPrimary">
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:padding="16dp">
+        <ImageView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:id="@+id/ab_back_btn"
+            android:layout_centerVertical="true"
+            android:src="@drawable/ic_baseline_arrow_back_24">
+
+        </ImageView>
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/long_app_name"
+            android:textColor="@color/white"
+            android:textSize="20sp"
+            android:layout_marginStart="16dp"
+            android:textStyle="bold"
+            android:layout_toEndOf="@id/ab_back_btn"
+            android:layout_centerVertical="true">
+        </TextView>
+        <ImageView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:id="@+id/ab_menu_btn"
+            android:layout_alignParentEnd="true"
+            android:src="@drawable/ic_baseline_menu_24">
+
+        </ImageView>
+    </RelativeLayout>
+
+</RelativeLayout>
