@@ -33,16 +33,18 @@ class MainActivity : AppCompatActivity() {
 
         if (!auth){
             val intent = Intent(this, loginActivity::class.java)
-            return startActivity(intent)
+            startActivity(intent)
         }
-        if (!onboarding) {
+        else if (!onboarding) {
             val intent = Intent(this, IntroActivity::class.java)
+            startActivity(intent)
+        }else{
+            // Go to pin code activity
+            val intent = Intent(this, passwordScreen::class.java)
             startActivity(intent)
         }
 
-        // Go to pin code activity
-        val intent = Intent(this, passwordScreen::class.java)
-        startActivity(intent)
+
 
 //        val intent = Intent(this, fileList::class.java)
 //        var path = Environment.getExternalStorageDirectory().path

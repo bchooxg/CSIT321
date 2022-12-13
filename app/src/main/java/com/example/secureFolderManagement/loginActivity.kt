@@ -92,7 +92,7 @@ class loginActivity : AppCompatActivity() {
 
     fun authenticateUser(username: String){
         val sp = getSharedPreferences(resources.getString(R.string.shared_prefs), MODE_PRIVATE)
-        PreferenceManager(sp).setAuth("Username")
+        PreferenceManager(sp).setAuth(username)
     }
 
 }

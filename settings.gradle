@@ -13,5 +13,5 @@ dependencyResolutionManagement {
         maven { url 'https://jitpack.io' }
     }
 }
-rootProject.name = "firstApp"
+rootProject.name = "secureFolderManagement"
 include ':app'

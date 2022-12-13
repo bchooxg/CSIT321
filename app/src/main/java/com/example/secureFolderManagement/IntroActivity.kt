@@ -93,11 +93,12 @@ class IntroActivity : AppIntro2() {
     override fun onDonePressed(currentFragment: Fragment?) {
         super.onDonePressed(currentFragment)
         // Decide what to do when the user clicks on "Done"
-        val intent = Intent(this, fileList::class.java)
-        var path = Environment.getExternalStorageDirectory().path
-        path += "/" + resources.getString(R.string.folderName)
+//        val intent = Intent(this, fileList::class.java)
+//        var path = Environment.getExternalStorageDirectory().path
+//        path += "/" + resources.getString(R.string.folderName)
+//        intent.putExtra("path", path)
         updateOnboardingFlag()
-        intent.putExtra("path", path)
+        val intent = Intent(this, MainActivity::class.java)
         startActivity(intent)
         finish()
     }
