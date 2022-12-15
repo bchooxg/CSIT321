@@ -27,10 +27,6 @@ class FileListAdapter(files: ArrayList<File>?, fileList: fileList) : RecyclerVie
         return FileViewHolder(parent, fileList)
     }
 
-   fun removeItem(position: Int) {
-
-    }
-
     @RequiresApi(Build.VERSION_CODES.O)
     override fun onBindViewHolder(holder: RecyclerView.ViewHolder, position: Int) {
         val file = files!![position]
@@ -143,7 +139,7 @@ class FileListAdapter(files: ArrayList<File>?, fileList: fileList) : RecyclerVie
         val imageView: ImageView? = null
         private var fileList: fileList? = null
         private var fileName: android.widget.TextView? = null
-        private var fileIcon: android.widget.ImageView? = null
+        private var fileIcon: ImageView? = null
 
         init {
             this.fileList = fileList

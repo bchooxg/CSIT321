@@ -215,6 +215,7 @@ class fileList : AppCompatActivity() {
 
         // get path from intent
         val path = intent.getStringExtra("path").toString()
+        Log.v("TEST", "Current Folder Path: $path")
         // Get list of files from path
         var files = File(path).listFiles()?.toCollection(ArrayList())
 
@@ -275,8 +276,9 @@ class fileList : AppCompatActivity() {
         //checkEmpty()
 
         recyclerView.layoutManager = androidx.recyclerview.widget.LinearLayoutManager(this)
+        recyclerView.adapter = FileListAdapter(files, this)
         refreshRecyclerView()
-//        recyclerView.adapter = FileListAdapter(files, this)
+
         // check if there are files in the directory
 
     }
