@@ -77,13 +77,26 @@ class FileListAdapter(files: ArrayList<File>?, fileList: fileList) : RecyclerVie
                         Log.v("Can Execute", file.canExecute().toString())
 
                         val fileObj = File(file.absolutePath)
-                        if (fileObj.delete()) {
-                            Log.v("File deleted", fileObj.absolutePath)
-                        } else {
-                            Log.v("File not deleted", fileObj.absolutePath)
+                        val isDir = fileObj.isDirectory
+                        var deleted = false
+                        if(isDir){
+                            // If file is directory, delete directory
+                            Log.v("TEST", "Deleting directory")
+                            deleted = fileObj.deleteRecursively()
+                            Log.v("TEST", "Deleted: $deleted")
+                        }else {
+                            deleted = fileObj.delete()
+
                         }
-                        // Remove item from recyclerview
-                        files?.removeAt(position)
+                        Log.v("TEST", "Deleted: $deleted")
+                        if(deleted){
+                            // Remove item from recyclerview
+                            files?.removeAt(position)
+                            Toast.makeText(fileList, "Item deleted", Toast.LENGTH_SHORT).show()
+                        }else{
+                            Toast.makeText(fileList, "Item not deleted", Toast.LENGTH_SHORT).show()
+                        }
+
 
                         // Update recycler view
                         Log.v("Position", position.toString())

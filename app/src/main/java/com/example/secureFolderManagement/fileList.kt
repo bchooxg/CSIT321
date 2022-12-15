@@ -51,35 +51,6 @@ class fileList : AppCompatActivity() {
         registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
             if (result.resultCode == Activity.RESULT_OK) {
 
-//                // Create intent to go to file list
-//                Log.v("TEST", "Gallery activity started")
-//                // get uri from intent
-//                val uri = result.data?.data
-//                Log.v("TEST", "URI: $uri")
-//
-//                // get bitmap from uri
-//                val bitmap = MediaStore.Images.Media.getBitmap(this.contentResolver, uri)
-//                // save bitmap as image in secure folder and delete from gallery
-//                saveImage(bitmap)
-//
-//                // get file name from uri
-//                val URIPathHelper = URIPathHelper()
-//                val fileName = URIPathHelper.getPath(this, uri!!)
-//
-//                val file = File(fileName)
-//
-//                // delete file
-//                if (file.delete()) {
-//                    Log.v("TEST", "File deleted")
-//                } else {
-//                    Log.v("TEST", "File not deleted")
-//                }
-//
-//                // refresh file list
-//                refreshRecyclerView()
-
-
-
 
                 // Create prompt to tell user about file photo deletion
                 val builder = AlertDialog.Builder(this)

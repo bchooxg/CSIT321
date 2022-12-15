@@ -1,14 +1,13 @@
-package com.example.secureFolderManagement
+package com.example.secureFolderManagement.activities
 
 import android.content.Context
 import android.content.Intent
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
-import android.os.Environment
 import android.util.Log
 import android.view.Menu
 import android.widget.Button
-import androidx.appcompat.widget.Toolbar
+import com.example.secureFolderManagement.*
 
 
 class MainActivity : AppCompatActivity() {
@@ -40,7 +39,7 @@ class MainActivity : AppCompatActivity() {
             startActivity(intent)
         }else{
             // Go to pin code activity
-            val intent = Intent(this, passwordScreen::class.java)
+            val intent = Intent(this, PasswordActivity::class.java)
             startActivity(intent)
         }
 
@@ -54,11 +53,11 @@ class MainActivity : AppCompatActivity() {
 //        Log.v("TEST", "Path: $path")
 //        startActivity(intent)
 
-        // Add logic
+        // Legacy logic for debugging purposes
 
         val btn = findViewById<Button>(R.id.button)
         btn.setOnClickListener {
-            val intent = Intent(this, passwordScreen::class.java)
+            val intent = Intent(this, PasswordActivity::class.java)
             intent.putExtra("key", "Test")
             startActivity(intent)
         }

@@ -1,13 +1,14 @@
-package com.example.secureFolderManagement
+package com.example.secureFolderManagement.activities
 
 import android.content.Intent
-import android.content.SharedPreferences
 import android.os.Bundle
 import android.util.Log
 import android.view.View
 import android.widget.EditText
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
+import com.example.secureFolderManagement.PreferenceManager
+import com.example.secureFolderManagement.R
 import com.example.secureFolderManagement.interfaces.ApiInterface
 import com.example.secureFolderManagement.models.UserRequest
 import com.example.secureFolderManagement.models.UserResponse

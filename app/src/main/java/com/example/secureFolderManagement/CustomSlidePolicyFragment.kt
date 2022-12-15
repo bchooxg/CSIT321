@@ -71,10 +71,17 @@ class CustomSlidePolicyFragment : Fragment(), SlidePolicy {
                 imageView.tag = R.drawable.ic_baseline_do_not_disturb_24
             }
             return res
+        }else{
+            Log.v("TEST", "SDK is less than 30")
+
         }
         return true
     }
 
+    private fun requestReadWritePermissions() {
+        val intent = Intent(Intent.ACTION_OPEN_DOCUMENT_TREE)
+        storagePermissionResultLauncher.launch(intent)
+    }
 
     @RequiresApi(Build.VERSION_CODES.R)
     private fun requestManagePermissions(){
