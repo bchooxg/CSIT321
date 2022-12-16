@@ -32,7 +32,7 @@
         <activity
             android:name=".activities.IntroActivity"
             android:label="My Custom AppIntro"
-            android:noHistory="true"/>
+            />
         <activity
             android:name=".fileList"
             android:exported="false">

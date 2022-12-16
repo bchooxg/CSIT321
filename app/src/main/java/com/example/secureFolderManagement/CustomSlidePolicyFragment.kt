@@ -49,38 +49,88 @@ class CustomSlidePolicyFragment : Fragment(), SlidePolicy {
         button.setOnClickListener {
             // Ask for permissions on button click
             if(!checkPermissions()){
-                requestManagePermissions()
+                requestPermissions()
             }
         }
     }
 
     fun checkPermissions(): Boolean {
+        var validFlag = false
+        // Separation of logic based on Android version
         if (Build.VERSION.SDK_INT >= 30) {
             Log.v("TEST", "SDK is 30 or greater")
             Log.v("TEST", "isExternalStorageManager: ${Environment.isExternalStorageManager()}")
-            val res = Environment.isExternalStorageManager()
-            if (res){
-                // If permissions are granted, set image to green check
-                imageView.setImageResource(R.drawable.ic_baseline_check_24_green)
-                imageView.tag = R.drawable.ic_baseline_check_24_green
-                checkOrCreateSecureFolder()
+            validFlag = Environment.isExternalStorageManager()
 
-            } else {
-                // If permissions are not granted, set image to red x
-                imageView.setImageResource(R.drawable.ic_baseline_do_not_disturb_24)
-                imageView.tag = R.drawable.ic_baseline_do_not_disturb_24
-            }
-            return res
         }else{
             Log.v("TEST", "SDK is less than 30")
-
+            // Request for read/write permissions
+            validFlag = checkReadWritePermissions()
         }
-        return true
+
+        // Combined logic by checking flag
+        if (validFlag){
+            // If permissions are granted, set image to green check
+            imageView.setImageResource(R.drawable.ic_baseline_check_24_green)
+            imageView.tag = R.drawable.ic_baseline_check_24_green
+            checkOrCreateSecureFolder()
+
+        } else {
+            // If permissions are not granted, set image to red x
+            imageView.setImageResource(R.drawable.ic_baseline_do_not_disturb_24)
+            imageView.tag = R.drawable.ic_baseline_do_not_disturb_24
+        }
+        return validFlag
+    }
+
+    private fun requestPermissions(){
+        if (Build.VERSION.SDK_INT >= 30) {
+            Log.v("TEST", "Requesting for manage external storage permissions")
+            requestManagePermissions()
+        }else{
+            Log.v("TEST", "Requesting for read write storage permissions")
+            requestReadWritePermissions()
+        }
+    }
+
+    private fun checkReadWritePermissions(): Boolean {
+        val readPermission = requireContext().checkSelfPermission(android.Manifest.permission.READ_EXTERNAL_STORAGE)
+        val writePermission = requireContext().checkSelfPermission(android.Manifest.permission.WRITE_EXTERNAL_STORAGE)
+        return readPermission == android.content.pm.PackageManager.PERMISSION_GRANTED && writePermission == android.content.pm.PackageManager.PERMISSION_GRANTED
     }
 
     private fun requestReadWritePermissions() {
-        val intent = Intent(Intent.ACTION_OPEN_DOCUMENT_TREE)
-        storagePermissionResultLauncher.launch(intent)
+        val result = context?.checkSelfPermission(android.Manifest.permission.WRITE_EXTERNAL_STORAGE)
+        Log.v("TEST", "Result from checking permissions: $result")
+        if (result == android.content.pm.PackageManager.PERMISSION_GRANTED) {
+            // If permissions are granted, set image to green check
+            imageView.setImageResource(R.drawable.ic_baseline_check_24_green)
+            imageView.tag = R.drawable.ic_baseline_check_24_green
+            checkOrCreateSecureFolder()
+        } else {
+            // If permissions are not granted, set image to red x
+            imageView.setImageResource(R.drawable.ic_baseline_do_not_disturb_24)
+            imageView.tag = R.drawable.ic_baseline_do_not_disturb_24
+            // Request for read/write permissions
+            // check if user has denied permission before
+            if (shouldShowRequestPermissionRationale(android.Manifest.permission.WRITE_EXTERNAL_STORAGE)) {
+                Toast.makeText(context, "Secure folder needs files permission to operate", Toast.LENGTH_LONG).show()
+            }else{
+                Toast.makeText(context, "Please enable from settings to proceed", Toast.LENGTH_LONG).show()
+                // open settings for app permissions
+                val intent = Intent(android.provider.Settings.ACTION_APPLICATION_DETAILS_SETTINGS)
+                val uri: Uri = Uri.fromParts("package", requireContext().packageName, null)
+                intent.data = uri
+                startActivity(intent)
+
+            }
+            requestPermissions(
+                arrayOf(
+                    android.Manifest.permission.READ_EXTERNAL_STORAGE,
+                    android.Manifest.permission.WRITE_EXTERNAL_STORAGE
+                ), 1
+            )
+        }
     }
 
     @RequiresApi(Build.VERSION_CODES.R)
