@@ -22,16 +22,17 @@
                 android:value="" />
         </activity>
         <activity
-            android:name=".loginActivity"
-            android:exported="false">
+            android:name=".activities.loginActivity"
+            android:exported="false"
+            android:noHistory="true">
             <meta-data
                 android:name="android.app.lib_name"
                 android:value="" />
         </activity>
         <activity
-            android:name=".IntroActivity"
+            android:name=".activities.IntroActivity"
             android:label="My Custom AppIntro"
-            android:noHistory="true"/>
+            />
         <activity
             android:name=".fileList"
             android:exported="false">
@@ -47,7 +48,7 @@
                 android:value="" />
         </activity>
         <activity
-            android:name=".passwordScreen"
+            android:name=".activities.PasswordActivity"
             android:exported="false"
             android:noHistory="true">
             <meta-data
@@ -55,7 +56,7 @@
                 android:value="" />
         </activity>
         <activity
-            android:name=".MainActivity"
+            android:name=".activities.MainActivity"
             android:exported="true"
             android:noHistory="true">
             <intent-filter>

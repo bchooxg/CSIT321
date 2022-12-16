@@ -1,10 +1,12 @@
-package com.example.secureFolderManagement
+package com.example.secureFolderManagement.activities
 
 import android.content.Intent
 import android.os.Bundle
 import android.os.Environment
 import android.widget.Toast
 import androidx.fragment.app.Fragment
+import com.example.secureFolderManagement.CustomSlidePolicyFragment
+import com.example.secureFolderManagement.R
 import com.github.appintro.*
 
 class IntroActivity : AppIntro2() {

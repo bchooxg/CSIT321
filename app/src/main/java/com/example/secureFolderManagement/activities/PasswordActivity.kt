@@ -1,4 +1,4 @@
-package com.example.secureFolderManagement
+package com.example.secureFolderManagement.activities
 
 import android.content.Intent
 import android.os.Bundle
@@ -7,14 +7,16 @@ import android.util.Log
 import android.widget.TextView
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
+import com.example.secureFolderManagement.PreferenceManager
+import com.example.secureFolderManagement.R
 import com.poovam.pinedittextfield.CirclePinField
 import com.poovam.pinedittextfield.PinField
 
 
-class passwordScreen : AppCompatActivity() {
+class PasswordActivity : AppCompatActivity() {
 
     fun toFileManagerActivity(){
-        val intent = Intent(this@passwordScreen, fileList::class.java)
+        val intent = Intent(this@PasswordActivity, com.example.secureFolderManagement.fileList::class.java)
         var path = Environment.getExternalStorageDirectory().path
         // Appending folder name to path
         path += "/"+resources.getString(R.string.folderName)
@@ -64,7 +66,7 @@ class passwordScreen : AppCompatActivity() {
                     }
 
 
-                    Toast.makeText(this@passwordScreen, "Saved Password", Toast.LENGTH_SHORT).show()
+                    Toast.makeText(this@PasswordActivity, "Saved Password", Toast.LENGTH_SHORT).show()
                     Log.v("password", enteredText)
                     toFileManagerActivity();
 
@@ -83,12 +85,12 @@ class passwordScreen : AppCompatActivity() {
                 override fun onTextComplete(enteredText: String): Boolean {
                     // save password to shared preferences
                     if (enteredText == pin) {
-                        Toast.makeText(this@passwordScreen, "Password Correct", Toast.LENGTH_SHORT).show()
+                        Toast.makeText(this@PasswordActivity, "Password Correct", Toast.LENGTH_SHORT).show()
                         Log.v("password", enteredText)
                         toFileManagerActivity();
                         return true
                     } else {
-                        Toast.makeText(this@passwordScreen, "Password Incorrect", Toast.LENGTH_SHORT).show()
+                        Toast.makeText(this@PasswordActivity, "Password Incorrect", Toast.LENGTH_SHORT).show()
                         Log.v("password", enteredText)
                         return false
                     }
