@@ -135,7 +135,7 @@ class CustomSlidePolicyFragment : Fragment(), SlidePolicy {
 
     @RequiresApi(Build.VERSION_CODES.R)
     private fun requestManagePermissions(){
-        Log.v("Debug", "Requesting permissions")
+        Log.v("TEST", "Requesting permissions")
         // create intent to open settings page
         val intent = Intent(android.provider.Settings.ACTION_MANAGE_APP_ALL_FILES_ACCESS_PERMISSION)
         intent.addCategory("android.intent.category.DEFAULT")

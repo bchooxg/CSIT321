@@ -68,9 +68,9 @@ class FileListAdapter(files: ArrayList<File>?, fileList: fileList) : RecyclerVie
                     "Delete" -> {
                         // Delete file
                         // Check permissions to delete file
-                        Log.v("Can write", file.canWrite().toString())
-                        Log.v("Can Read", file.canRead().toString())
-                        Log.v("Can Execute", file.canExecute().toString())
+                        Log.v("TEST", file.canWrite().toString())
+                        Log.v("TEST", file.canRead().toString())
+                        Log.v("TEST", file.canExecute().toString())
 
                         val fileObj = File(file.absolutePath)
                         val isDir = fileObj.isDirectory
@@ -95,13 +95,13 @@ class FileListAdapter(files: ArrayList<File>?, fileList: fileList) : RecyclerVie
 
 
                         // Update recycler view
-                        Log.v("Position", position.toString())
-                        Log.v("Files", files.toString())
-                        Log.v("Files", files?.size.toString())
+                        Log.v("TEST", position.toString())
+                        Log.v("TEST", files.toString())
+                        Log.v("TEST", files?.size.toString())
                         notifyItemRemoved(position)
                         notifyItemRangeChanged(position, this.itemCount)
-                        Log.v("Files", files.toString())
-                        Log.v("Files", files?.size.toString())
+                        Log.v("TEST", files.toString())
+                        Log.v("TEST", files?.size.toString())
 
 
 

@@ -61,13 +61,13 @@ class FileManager : AppCompatActivity() {
                 val folder = File(path)
                 if (!folder.exists()) {
                     try{
-                        Log.v("Debug", "Folder not found, attempting to create folder")
+                        Log.v("TEST", "Folder not found, attempting to create folder")
                         folder.mkdir()
                     }catch (e: Exception){
                         Toast.makeText(this, "Error creating folder", Toast.LENGTH_SHORT).show()
                     }
                 }
-                Log.v("Debug", "Folder found, moving to folder")
+                Log.v("TEST", "Folder found, moving to folder")
                 intent.putExtra("path", path)
                 startActivity(intent)
             }
@@ -79,25 +79,25 @@ class FileManager : AppCompatActivity() {
     @RequiresApi(Build.VERSION_CODES.R)
     private fun checkWritePermissions(): Boolean {
         val writePermission = ContextCompat.checkSelfPermission(this, Manifest.permission.WRITE_EXTERNAL_STORAGE)
-        Log.v("Write Permission", writePermission.toString())
+        Log.v("TEST", writePermission.toString())
         return writePermission == PackageManager.PERMISSION_GRANTED
     }
     @RequiresApi(Build.VERSION_CODES.R)
     private fun checkManagePermisssions(): Boolean {
         // Call environment is external storage manager
-        Log.v("Manage Permission", Environment.isExternalStorageManager().toString())
+        Log.v("TEST", Environment.isExternalStorageManager().toString())
         return Environment.isExternalStorageManager()
     }
 
     // Request permission to read and write to external storage
     @RequiresApi(Build.VERSION_CODES.R)
     private fun requestWritePermissions() {
-        Log.v("Debug", "Requesting permissions")
+        Log.v("TEST", "Requesting permissions")
         ActivityCompat.requestPermissions(this, arrayOf(Manifest.permission.WRITE_EXTERNAL_STORAGE, Manifest.permission.MANAGE_EXTERNAL_STORAGE), 1)
      }
     @RequiresApi(Build.VERSION_CODES.R)
     private fun requestManagePermissions(){
-        Log.v("Debug", "Requesting permissions")
+        Log.v("TEST", "Requesting permissions")
         // create intent to open settings page
         val intent = Intent(android.provider.Settings.ACTION_MANAGE_APP_ALL_FILES_ACCESS_PERMISSION)
         intent.addCategory("android.intent.category.DEFAULT")

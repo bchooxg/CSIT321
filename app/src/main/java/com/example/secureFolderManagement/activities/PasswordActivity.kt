@@ -67,7 +67,7 @@ class PasswordActivity : AppCompatActivity() {
 
 
                     Toast.makeText(this@PasswordActivity, "Saved Password", Toast.LENGTH_SHORT).show()
-                    Log.v("password", enteredText)
+                    Log.v("TEST", enteredText)
                     toFileManagerActivity();
 
                     return true
@@ -86,12 +86,12 @@ class PasswordActivity : AppCompatActivity() {
                     // save password to shared preferences
                     if (enteredText == pin) {
                         Toast.makeText(this@PasswordActivity, "Password Correct", Toast.LENGTH_SHORT).show()
-                        Log.v("password", enteredText)
+                        Log.v("TEST", enteredText)
                         toFileManagerActivity();
                         return true
                     } else {
                         Toast.makeText(this@PasswordActivity, "Password Incorrect", Toast.LENGTH_SHORT).show()
-                        Log.v("password", enteredText)
+                        Log.v("TEST", enteredText)
                         return false
                     }
                 }
