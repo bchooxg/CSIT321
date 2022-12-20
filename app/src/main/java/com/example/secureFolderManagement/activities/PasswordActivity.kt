@@ -43,7 +43,7 @@ class PasswordActivity : AppCompatActivity() {
                         firstPass = enteredText
                         circleField.setText("")
                         // edit textview to ask for password again
-                        val textView = findViewById<TextView>(R.id.tv_pinScreen)
+                        val textView = findViewById<TextView>(R.id.tv_pinScreen_header)
                         textView.text = "Please enter your password again"
                         return false
                     }
@@ -52,7 +52,7 @@ class PasswordActivity : AppCompatActivity() {
                     if (firstPass != enteredText) {
                         circleField.setText("")
                         // edit textview to ask for password again
-                        val textView = findViewById<TextView>(R.id.tv_pinScreen)
+                        val textView = findViewById<TextView>(R.id.tv_pinScreen_header)
                         textView.text = "Passwords do not match. Please enter your password again"
                         return false
                     }
@@ -79,19 +79,37 @@ class PasswordActivity : AppCompatActivity() {
         // Confirm Password Flow
         fun confirmPassword(pin: String) {
             val circleField = findViewById<CirclePinField>(R.id.circleField)
-            val tv = findViewById<TextView>(R.id.tv_pinScreen)
+            val tv = findViewById<TextView>(R.id.tv_pinScreen_header)
+            val errMsg = findViewById<TextView>(R.id.tv_pinScreen_error)
+            // get max password tries from shared preferences
+            val sharedPref = getSharedPreferences(resources.getString(R.string.shared_prefs), MODE_PRIVATE)
+            val maxTries = sharedPref.getInt("maxTries", 5)
+            var tries = sharedPref.getInt("tries", 0)
+
             tv.text = "Please enter your password"
             circleField.onTextCompleteListener = object : PinField.OnTextCompleteListener {
                 override fun onTextComplete(enteredText: String): Boolean {
                     // save password to shared preferences
-                    if (enteredText == pin) {
-                        Toast.makeText(this@PasswordActivity, "Password Correct", Toast.LENGTH_SHORT).show()
+
+                    if(tries >= maxTries){
+                        errMsg.visibility = TextView.VISIBLE
+                        errMsg.text = "Tries Exceeded. Please ask your administrator to unlock your account."
+                        return false
+                    }
+                    else if (enteredText == pin) {
                         Log.v("TEST", enteredText)
                         toFileManagerActivity();
                         return true
                     } else {
-                        Toast.makeText(this@PasswordActivity, "Password Incorrect", Toast.LENGTH_SHORT).show()
                         Log.v("TEST", enteredText)
+                        circleField.setText("")
+                        tries++
+                        with(sharedPref.edit()) {
+                            putInt("tries", tries)
+                            commit()
+                        }
+                        errMsg.visibility = TextView.VISIBLE
+                        errMsg.text = "Incorrect Password $tries/$maxTries tries"
                         return false
                     }
                 }
@@ -113,6 +131,7 @@ class PasswordActivity : AppCompatActivity() {
 
         if(!isPinSet) {
             setUpPassword()
+            PreferenceManager(sp).setPINflag(true)
         } else {
             confirmPassword(pin)
         }

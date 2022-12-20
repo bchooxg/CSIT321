@@ -53,7 +53,7 @@ class loginActivity : AppCompatActivity() {
             ) {
                 val body = response.body()
                 for (data in body!!){
-                    Log.v("TEST", "Username: ${data.username}, Password: ${data.password}")
+                    Log.v("TEST", "Username: ${data.username}}")
                 }
             }
 
@@ -73,6 +73,23 @@ class loginActivity : AppCompatActivity() {
                 ) {
                     if (response.isSuccessful) {
                         Log.v("TEST", "Response: ${response.body()}")
+                        val userResponse = response.body()
+
+                        // Get additional user info from response and save to shared preferences
+                        val sp = getSharedPreferences(resources.getString(R.string.shared_prefs), MODE_PRIVATE)
+                        PreferenceManager(sp).setUserGroupSettings(
+                            usergroup = userResponse!!.usergroup,
+                            minPass = userResponse.minPass,
+                            requireBiometrics = userResponse.requireBiometrics,
+                            requireEncryption = userResponse.requireEncryption,
+                            companyID = userResponse.company_id,
+                            pinType = userResponse.pin_type,
+                            pinMaxTries = userResponse.pin_max_tries,
+                            pinLockoutTime = userResponse.pin_lockout_time
+                        )
+
+
+
                         authenticateUser(username)
                         Toast.makeText(applicationContext, "Login Successful", Toast.LENGTH_SHORT).show()
                         // go to main activity
@@ -95,5 +112,6 @@ class loginActivity : AppCompatActivity() {
         val sp = getSharedPreferences(resources.getString(R.string.shared_prefs), MODE_PRIVATE)
         PreferenceManager(sp).setAuth(username)
     }
+
 
 }

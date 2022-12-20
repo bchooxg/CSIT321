@@ -25,6 +25,7 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.FileProvider
 import androidx.recyclerview.widget.RecyclerView
 import androidx.appcompat.widget.Toolbar
+import com.example.secureFolderManagement.activities.loginActivity
 import com.google.android.material.floatingactionbutton.FloatingActionButton
 import java.io.File
 import java.io.FileOutputStream
@@ -169,9 +170,10 @@ class fileList : AppCompatActivity() {
             R.id.ab_option_logOut
             -> {
                 // Create intent to go to about
-//                val intent = Intent(this, about::class.java)
-//                startActivity(intent)
-                Toast.makeText(this, "Option 2 Clicked", Toast.LENGTH_SHORT).show()
+                val sp = getSharedPreferences(resources.getString(R.string.shared_prefs), MODE_PRIVATE)
+                PreferenceManager(sp).logout()
+                val intent = Intent(this, loginActivity::class.java)
+                startActivity(intent)
                 true
             }
             else -> super.onOptionsItemSelected(item)

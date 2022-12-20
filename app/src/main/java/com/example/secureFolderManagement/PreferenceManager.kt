@@ -25,6 +25,11 @@ class PreferenceManager(sp: SharedPreferences){
         return true
     }
 
+    fun logout() {
+        sharedPref.edit().putBoolean("isAuth", false).apply()
+        sharedPref.edit().putBoolean("isPinSet", false).apply()
+    }
+
     fun unsetAuth() {
         sharedPref.edit().putBoolean("isAuth", false).apply()
         sharedPref.edit().remove("username").apply()
@@ -57,6 +62,28 @@ class PreferenceManager(sp: SharedPreferences){
         val editor = sharedPref.edit()
         editor.putString("username", username)
         editor.apply()
+    }
+
+    fun setUserGroupSettings(usergroup: String,
+                             minPass: Int,
+                             requireBiometrics: Boolean,
+                             requireEncryption: Boolean,
+                             pinType: String,
+                             companyID:String,
+                             pinMaxTries: Int,
+                             pinLockoutTime: Int){
+        val editor = sharedPref.edit()
+        editor.putString("usergroup", usergroup)
+        editor.putInt("minPass", minPass)
+        editor.putString("usergroup", usergroup)
+        editor.putString("companyID", companyID)
+        editor.putBoolean("requireEncryption", requireEncryption)
+        editor.putBoolean("requireBiometris", requireBiometrics)
+        editor.putString("pinType", pinType)
+        editor.putInt("pinMaxTries", pinMaxTries)
+        editor.putInt("pinLockoutTime", pinLockoutTime)
+        editor.apply()
+
     }
 
 
