@@ -47,9 +47,18 @@ class PasswordActivity : AppCompatActivity() {
                         textView.text = "Please enter your password again"
                         return false
                     }
-
+                    if (firstPass == enteredText){
+                        // save password to shared preferences
+                        val sharedPref = getSharedPreferences(resources.getString(R.string.shared_prefs), MODE_PRIVATE)
+                        with(sharedPref.edit()) {
+                            putString("PIN", enteredText)
+                            putBoolean("isPinSet", true)
+                            commit()
+                        }
+                        return true
+                    }
                     // check if first password and entered password match
-                    if (firstPass != enteredText) {
+                    else if (firstPass != enteredText) {
                         circleField.setText("")
                         // edit textview to ask for password again
                         val textView = findViewById<TextView>(R.id.tv_pinScreen_header)
@@ -57,13 +66,7 @@ class PasswordActivity : AppCompatActivity() {
                         return false
                     }
 
-                    // save password to shared preferences
-                    val sharedPref = getSharedPreferences(resources.getString(R.string.shared_prefs), MODE_PRIVATE)
-                    with(sharedPref.edit()) {
-                        putString("PIN", enteredText)
-                        putBoolean("isPinSet", true)
-                        commit()
-                    }
+
 
 
                     Toast.makeText(this@PasswordActivity, "Saved Password", Toast.LENGTH_SHORT).show()
@@ -98,6 +101,10 @@ class PasswordActivity : AppCompatActivity() {
                     }
                     else if (enteredText == pin) {
                         Log.v("TEST", enteredText)
+                        with(sharedPref.edit()) {
+                            putInt("tries", 0)
+                            commit()
+                        }
                         toFileManagerActivity();
                         return true
                     } else {

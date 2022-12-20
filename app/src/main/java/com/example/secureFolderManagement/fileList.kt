@@ -174,6 +174,7 @@ class fileList : AppCompatActivity() {
                 PreferenceManager(sp).logout()
                 val intent = Intent(this, loginActivity::class.java)
                 startActivity(intent)
+                finish()
                 true
             }
             else -> super.onOptionsItemSelected(item)
