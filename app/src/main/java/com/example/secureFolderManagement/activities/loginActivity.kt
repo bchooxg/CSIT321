@@ -10,6 +10,8 @@ import androidx.appcompat.app.AppCompatActivity
 import com.example.secureFolderManagement.PreferenceManager
 import com.example.secureFolderManagement.R
 import com.example.secureFolderManagement.interfaces.ApiInterface
+import com.example.secureFolderManagement.models.UserPollRequest
+import com.example.secureFolderManagement.models.UserPollResponse
 import com.example.secureFolderManagement.models.UserRequest
 import com.example.secureFolderManagement.models.UserResponse
 import com.example.secureFolderManagement.services.ServiceBuilder
@@ -112,6 +114,7 @@ class loginActivity : AppCompatActivity() {
         val sp = getSharedPreferences(resources.getString(R.string.shared_prefs), MODE_PRIVATE)
         PreferenceManager(sp).setAuth(username)
     }
+
 
 
 }
