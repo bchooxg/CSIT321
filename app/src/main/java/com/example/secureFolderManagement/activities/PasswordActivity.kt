@@ -37,17 +37,35 @@ class PasswordActivity : AppCompatActivity() {
         setContentView(R.layout.activity_password_screen)
 
         /* Function Definition Start */
+        fun pollUser2(username: String) {
+            val errMsg = findViewById<TextView>(R.id.tv_pinScreen_error)
+            val circleField = findViewById<CirclePinField>(R.id.circleField)
+            val response = ServiceBuilder.buildService(ApiInterface::class.java)
+            response.pollUser(username).execute().body()?.let {
+                Log.v("TEST", "Response: $it")
+                if (it.is_locked) {
+                    errMsg.text = "User is locked"
+                    circleField.setText("")
+                } else {
+                    toFileManagerActivity()
+                }
+            }
+
+
+        }
 
 
         // Set Up Password Flow for First Time flow
         fun setUpPassword() {
             val sp = getSharedPreferences(resources.getString(R.string.shared_prefs), MODE_PRIVATE)
             var firstPass = ""
+            val tv = findViewById<TextView>(R.id.tv_pinScreen_header)
             val circleField = findViewById<CirclePinField>(R.id.circleField)
+            tv.text = "Please set your password"
             val pinLength = sp.getInt("minPass", 4)
 
             // Set pin length
-            circleField.numberOfFields = pinLength.toInt()
+            circleField.numberOfFields = pinLength
             circleField.onTextCompleteListener = object : PinField.OnTextCompleteListener {
                 override fun onTextComplete(enteredText: String): Boolean {
 
@@ -62,7 +80,7 @@ class PasswordActivity : AppCompatActivity() {
                     }
 
                     // check if first password and entered password match
-                    if (firstPass != enteredText) {
+                    else if (firstPass != enteredText) {
                         circleField.setText("")
                         // edit textview to ask for password again
                         val textView = findViewById<TextView>(R.id.tv_pinScreen_header)
@@ -88,6 +106,57 @@ class PasswordActivity : AppCompatActivity() {
             }
 
         }
+        fun pollUser(username: String) {
+            val errMsg = findViewById<TextView>(R.id.tv_pinScreen_error)
+            val circleField = findViewById<CirclePinField>(R.id.circleField)
+            val response = ServiceBuilder.buildService(ApiInterface::class.java)
+            response.pollUser(username).enqueue(
+                object : Callback<UserPollResponse> {
+                    override fun onResponse(
+                        call: Call<UserPollResponse>,
+                        response: Response<UserPollResponse>
+                    ) {
+                        val responseBody = response.body()
+                        Log.v("TEST", "Response: $responseBody")
+                        if (response.isSuccessful) {
+                            // Get boolean value from response
+                            val isLocked = responseBody?.is_locked
+                            // If the user is locked, then show a toast message
+                            if(isLocked == true){
+                                errMsg.text = "Your account is locked. Please contact your administrator"
+                                errMsg.visibility = TextView.VISIBLE
+                                circleField.isEnabled = false
+                            }else{
+                                // Set the tries to 0
+                                val sharedPref = getSharedPreferences(resources.getString(R.string.shared_prefs), MODE_PRIVATE)
+                                with(sharedPref.edit()) {
+                                    putInt("tries", 0)
+                                    putBoolean("isLocked", false)
+                                    putBoolean("isPinSet", false)
+                                    commit()
+                                }
+                                errMsg.text = "Your account has been unlocked please try again"
+                                errMsg.visibility = TextView.VISIBLE
+                                circleField.isEnabled = true
+                                setUpPassword()
+                            }
+
+
+                        } else {
+                            Toast.makeText(applicationContext, "Req Failed", Toast.LENGTH_SHORT).show()
+                        }
+                    }
+
+                    override fun onFailure(call: Call<UserPollResponse>, t: Throwable) {
+                        Toast.makeText(this@PasswordActivity, t.toString(), Toast.LENGTH_LONG).show()
+                    }
+
+                }
+            )
+
+
+
+        }
 
         // Confirm Password Flow
         fun confirmPassword(pin: String) {
@@ -95,7 +164,7 @@ class PasswordActivity : AppCompatActivity() {
             val tv = findViewById<TextView>(R.id.tv_pinScreen_header)
             val errMsg = findViewById<TextView>(R.id.tv_pinScreen_error)
             val sp = getSharedPreferences(resources.getString(R.string.shared_prefs), MODE_PRIVATE)
-            var maxTries = sp.getInt("maxTries", 5)
+            var maxTries = sp.getInt("pinMaxTries", 5)
             var tries = sp.getInt("tries", 0)
             var username = sp.getString("username", "")
             var isLocked = sp.getBoolean("isLocked", false)
@@ -104,53 +173,7 @@ class PasswordActivity : AppCompatActivity() {
             // Set pin length
             circleField.numberOfFields = pinLength.toInt()
 
-            fun pollUser(username: String) {
-                val response = ServiceBuilder.buildService(ApiInterface::class.java)
-                response.pollUser(username).enqueue(
-                    object : Callback<UserPollResponse> {
-                        override fun onResponse(
-                            call: Call<UserPollResponse>,
-                            response: Response<UserPollResponse>
-                        ) {
-                            val responseBody = response.body()
-                            Log.v("TEST", "Response: $responseBody")
-                            if (response.isSuccessful) {
-                                // Get boolean value from response
-                                val isLocked = responseBody?.is_locked
-                                // If the user is locked, then show a toast message
-                                if(isLocked == true){
-                                    errMsg.text = "Your account is locked. Please contact your administrator"
-                                    errMsg.visibility = TextView.VISIBLE
-                                    circleField.isEnabled = false
-                                }else{
-                                    // Set the tries to 0
-                                    val sharedPref = getSharedPreferences(resources.getString(R.string.shared_prefs), MODE_PRIVATE)
-                                    with(sharedPref.edit()) {
-                                        putInt("tries", 0)
-                                        putBoolean("isLocked", false)
-                                        commit()
-                                    }
-                                    errMsg.text = "Your account has been unlocked please try again"
-                                    errMsg.visibility = TextView.VISIBLE
-                                    circleField.isEnabled = true
-                                }
 
-
-                            } else {
-                                Toast.makeText(applicationContext, "Req Failed", Toast.LENGTH_SHORT).show()
-                            }
-                        }
-
-                        override fun onFailure(call: Call<UserPollResponse>, t: Throwable) {
-                            Toast.makeText(this@PasswordActivity, t.toString(), Toast.LENGTH_LONG).show()
-                        }
-
-                    }
-                )
-
-
-
-            }
 
             tv.text = "Please enter your password"
 
@@ -163,8 +186,11 @@ class PasswordActivity : AppCompatActivity() {
                 override fun onTextComplete(enteredText: String): Boolean {
                     // get max password tries from shared preferences
 
+                    // Refresh tries
+                    tries = sp.getInt("tries", 0)
 
-                    if(tries >= maxTries){
+
+                    if(tries >= maxTries - 1){
                         errMsg.visibility = TextView.VISIBLE
                         errMsg.text = "Tries Exceeded. Please ask your administrator to unlock your account."
                         circleField.setText("")
@@ -209,11 +235,15 @@ class PasswordActivity : AppCompatActivity() {
         val sp = getSharedPreferences(resources.getString(R.string.shared_prefs), MODE_PRIVATE)
         val isPinSet = PreferenceManager(sp).checkPINflag()
         val pin = PreferenceManager(sp).getPIN()
+        val isLocked = sp.getBoolean("isLocked", false)
+        val username = sp.getString("username", "")
 
+        if(isLocked){
+            return pollUser(username.toString())
+        }
 
         if(!isPinSet) {
             setUpPassword()
-            PreferenceManager(sp).setPINflag(true)
         } else {
             confirmPassword(pin)
         }
