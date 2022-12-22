@@ -81,9 +81,9 @@ class loginActivity : AppCompatActivity() {
                         val sp = getSharedPreferences(resources.getString(R.string.shared_prefs), MODE_PRIVATE)
                         PreferenceManager(sp).setUserGroupSettings(
                             usergroup = userResponse!!.usergroup,
-                            minPass = userResponse.minPass,
-                            requireBiometrics = userResponse.requireBiometrics,
-                            requireEncryption = userResponse.requireEncryption,
+                            minPass = userResponse.min_pass,
+                            requireBiometrics = userResponse.require_biometrics,
+                            requireEncryption = userResponse.require_encryption,
                             companyID = userResponse.company_id,
                             pinType = userResponse.pin_type,
                             pinMaxTries = userResponse.pin_max_tries,

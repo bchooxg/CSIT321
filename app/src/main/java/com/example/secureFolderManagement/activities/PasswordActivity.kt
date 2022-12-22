@@ -41,8 +41,13 @@ class PasswordActivity : AppCompatActivity() {
 
         // Set Up Password Flow for First Time flow
         fun setUpPassword() {
+            val sp = getSharedPreferences(resources.getString(R.string.shared_prefs), MODE_PRIVATE)
             var firstPass = ""
             val circleField = findViewById<CirclePinField>(R.id.circleField)
+            val pinLength = sp.getInt("minPass", 4)
+
+            // Set pin length
+            circleField.numberOfFields = pinLength.toInt()
             circleField.onTextCompleteListener = object : PinField.OnTextCompleteListener {
                 override fun onTextComplete(enteredText: String): Boolean {
 
@@ -55,7 +60,17 @@ class PasswordActivity : AppCompatActivity() {
                         textView.text = "Please enter your password again"
                         return false
                     }
-                    if (firstPass == enteredText){
+
+                    // check if first password and entered password match
+                    if (firstPass != enteredText) {
+                        circleField.setText("")
+                        // edit textview to ask for password again
+                        val textView = findViewById<TextView>(R.id.tv_pinScreen_header)
+                        textView.text = "Passwords do not match. Please enter your password again"
+                        return false
+                    }
+                    // If the passwords match, save the password to shared preferences and move on to next activity
+                    else if (firstPass == enteredText){
                         // save password to shared preferences
                         val sharedPref = getSharedPreferences(resources.getString(R.string.shared_prefs), MODE_PRIVATE)
                         with(sharedPref.edit()) {
@@ -63,24 +78,11 @@ class PasswordActivity : AppCompatActivity() {
                             putBoolean("isPinSet", true)
                             commit()
                         }
+                        Toast.makeText(this@PasswordActivity, "Saved Password", Toast.LENGTH_SHORT).show()
+                        Log.v("TEST", enteredText)
+                        toFileManagerActivity();
                         return true
                     }
-                    // check if first password and entered password match
-                    else if (firstPass != enteredText) {
-                        circleField.setText("")
-                        // edit textview to ask for password again
-                        val textView = findViewById<TextView>(R.id.tv_pinScreen_header)
-                        textView.text = "Passwords do not match. Please enter your password again"
-                        return false
-                    }
-
-
-
-
-                    Toast.makeText(this@PasswordActivity, "Saved Password", Toast.LENGTH_SHORT).show()
-                    Log.v("TEST", enteredText)
-                    toFileManagerActivity();
-
                     return true
                 }
             }
@@ -92,11 +94,15 @@ class PasswordActivity : AppCompatActivity() {
             val circleField = findViewById<CirclePinField>(R.id.circleField)
             val tv = findViewById<TextView>(R.id.tv_pinScreen_header)
             val errMsg = findViewById<TextView>(R.id.tv_pinScreen_error)
-            val sharedPref = getSharedPreferences(resources.getString(R.string.shared_prefs), MODE_PRIVATE)
-            var maxTries = sharedPref.getInt("maxTries", 5)
-            var tries = sharedPref.getInt("tries", 0)
-            var username = sharedPref.getString("username", "")
-            var isLocked = sharedPref.getBoolean("isLocked", false)
+            val sp = getSharedPreferences(resources.getString(R.string.shared_prefs), MODE_PRIVATE)
+            var maxTries = sp.getInt("maxTries", 5)
+            var tries = sp.getInt("tries", 0)
+            var username = sp.getString("username", "")
+            var isLocked = sp.getBoolean("isLocked", false)
+            val pinLength = sp.getInt("minPass", 4)
+
+            // Set pin length
+            circleField.numberOfFields = pinLength.toInt()
 
             fun pollUser(username: String) {
                 val response = ServiceBuilder.buildService(ApiInterface::class.java)
@@ -164,7 +170,7 @@ class PasswordActivity : AppCompatActivity() {
                         circleField.setText("")
                         circleField.isEnabled = false
 //                        pollUser(username.toString())
-                        with(sharedPref.edit()) {
+                        with(sp.edit()) {
                             putBoolean("isLocked", true)
                             commit()
                         }
@@ -173,7 +179,7 @@ class PasswordActivity : AppCompatActivity() {
                     }
                     else if (enteredText == pin) {
                         Log.v("TEST", enteredText)
-                        with(sharedPref.edit()) {
+                        with(sp.edit()) {
                             putInt("tries", 0)
                             commit()
                         }
@@ -183,7 +189,7 @@ class PasswordActivity : AppCompatActivity() {
                         Log.v("TEST", enteredText)
                         circleField.setText("")
                         tries++
-                        with(sharedPref.edit()) {
+                        with(sp.edit()) {
                             putInt("tries", tries)
                             commit()
                         }
@@ -203,6 +209,7 @@ class PasswordActivity : AppCompatActivity() {
         val sp = getSharedPreferences(resources.getString(R.string.shared_prefs), MODE_PRIVATE)
         val isPinSet = PreferenceManager(sp).checkPINflag()
         val pin = PreferenceManager(sp).getPIN()
+
 
         if(!isPinSet) {
             setUpPassword()

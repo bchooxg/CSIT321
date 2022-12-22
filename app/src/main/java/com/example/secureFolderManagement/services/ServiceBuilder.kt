@@ -8,7 +8,7 @@ object ServiceBuilder {
     private val client = OkHttpClient.Builder().build()
 
     private val retrofit = Retrofit.Builder()
-        .baseUrl("https://secure-folder-webservice.onrender.com") // todo find a way to get this from strings.xml
+        .baseUrl("https://securefolderwebserver.onrender.com") // todo find a way to get this from strings.xml
         .addConverterFactory(GsonConverterFactory.create())
         .client(client)
         .build()
