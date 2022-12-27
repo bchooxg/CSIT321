@@ -4,6 +4,7 @@ import android.app.Activity
 import android.content.*
 import android.database.Cursor
 import android.graphics.Bitmap
+import android.graphics.BitmapFactory
 import android.net.Uri
 import android.os.Build
 import android.os.Bundle
@@ -13,7 +14,6 @@ import android.provider.MediaStore
 import android.util.Log
 import android.view.Menu
 import android.view.MenuItem
-import android.view.View
 import android.webkit.MimeTypeMap
 import android.widget.*
 import androidx.activity.result.ActivityResultLauncher
@@ -22,13 +22,20 @@ import androidx.activity.result.contract.ActivityResultContracts
 import androidx.annotation.RequiresApi
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
+import androidx.appcompat.widget.Toolbar
 import androidx.core.content.FileProvider
 import androidx.recyclerview.widget.RecyclerView
-import androidx.appcompat.widget.Toolbar
+import androidx.security.crypto.EncryptedFile
+import androidx.security.crypto.MasterKey
+import androidx.security.crypto.MasterKeys
+import androidx.security.crypto.MasterKeys.AES256_GCM_SPEC
 import com.example.secureFolderManagement.activities.loginActivity
 import com.google.android.material.floatingactionbutton.FloatingActionButton
+import java.io.ByteArrayOutputStream
 import java.io.File
 import java.io.FileOutputStream
+import java.io.InputStream
+import java.net.URI
 import java.time.LocalDateTime
 import java.time.format.DateTimeFormatter
 import java.util.*
@@ -67,9 +74,10 @@ class fileList : AppCompatActivity() {
                     Log.v("TEST", "URI: $uri")
                     // get bitmap from uri
                     val bitmap = MediaStore.Images.Media.getBitmap(this.contentResolver, uri)
+
                     // Get file path from current intent
-                    // save bitmap as image in secure folder and delete from gallery
-                    saveImage(bitmap)
+//                    saveImage(bitmap)
+                    saveEncryptedImage(bitmap)
                     // delete image from gallery
                     val URIPathHelper = URIPathHelper()
                     val fileName = URIPathHelper.getPath(this, uri!!)
@@ -103,17 +111,41 @@ class fileList : AppCompatActivity() {
         }
 
 
+    fun saveEncryptedImage(bitmap: Bitmap)
+    {
+        val fileName = generateFileName("E_IMG_", ".jpg")
+        val path = intent.getStringExtra("path")
+        val file = File(path, fileName)
+        // turn bitmap into byte array
+        val bos = ByteArrayOutputStream()
+        bitmap.compress(Bitmap.CompressFormat.JPEG, 100, bos)
+        val bitmapData = bos.toByteArray()
+
+        val masterKeyAlias = MasterKeys.getOrCreate(AES256_GCM_SPEC)
+        val encryptedFile = EncryptedFile.Builder(
+            file,
+            this,
+            masterKeyAlias,
+            EncryptedFile.FileEncryptionScheme.AES256_GCM_HKDF_4KB
+        ).build()
+        encryptedFile.openFileOutput().use {
+            it.write(bitmapData)
+        }
+    }
+
+
     @RequiresApi(Build.VERSION_CODES.R)
     fun saveImage(bitmap: Bitmap?) {
 
         val fileName = generateFileName("IMG_", ".jpg")
-        val encryptedFileName = "E" + fileName
         // Get filepath from intent
         val path = intent.getStringExtra("path")
         // create file
         val file = File(path, fileName)
         val fOut = FileOutputStream(file)
 
+        // encrypt file
+//        encryptFile(file)
 //        // Encryption Logic START
 //        val eFile = File(path, encryptedFileName)
 //        val eFOut = FileOutputStream(eFile)
@@ -232,7 +264,8 @@ class fileList : AppCompatActivity() {
                 // get bitmap from uri
                 val bitmap = MediaStore.Images.Media.getBitmap(this.contentResolver, tempUri)
                 // save bitmap as image in secure folder
-                saveImage(bitmap)
+//                saveImage(bitmap)
+                saveEncryptedImage(bitmap)
                 Log.v("TEST", "Photo saved")
 
                 refreshRecyclerView()
@@ -320,29 +353,60 @@ class fileList : AppCompatActivity() {
         startActivity(intent)
     }
 
+
+    // function to decrypt image
+    @RequiresApi(Build.VERSION_CODES.O)
+    fun decryptImage(context: Context, target: File): Uri? {
+        val mainKey = MasterKey.Builder(context)
+            .setKeyScheme(MasterKey.KeyScheme.AES256_GCM)
+            .build()
+
+        val file = EncryptedFile.Builder(
+            context,
+            target, mainKey, EncryptedFile.FileEncryptionScheme.AES256_GCM_HKDF_4KB
+        )
+            .build()
+
+        val stream: InputStream = file.openFileInput()
+        val bitmap = BitmapFactory.decodeStream(stream)
+        stream.close()
+        // get temp uri for image
+        val tempUri = initTempUri()
+        // save bitmap to temp uri
+        saveBitmapToUri(bitmap, tempUri)
+        return tempUri;
+    }
+
+    private fun saveBitmapToUri(bitmap: Bitmap?, tempUri: Uri) {
+        val outputStream = contentResolver.openOutputStream(tempUri)
+        bitmap?.compress(Bitmap.CompressFormat.JPEG, 100, outputStream)
+        outputStream?.close()
+    }
+
     fun openFile(uri: Uri?) {
         // Check extension of file
         val extension = MimeTypeMap.getFileExtensionFromUrl(uri.toString())
         Log.v("TEST", "Extension: $extension")
+
+        val filename = uri?.path?.substringAfterLast("/")
+        val encryptionFlag = filename?.startsWith("E_")
+        Log.v("TEST", "Encryption Flag: $encryptionFlag")
+
         if (extension == "jpg" || extension == "png") {
 
-//            // Decryption Logic Start
-//            // get file from uri
-//            val file = File(uri?.path.toString())
-//            // decrypt byte array
-//            val cm = CryptoManager()
-//            val fis = FileInputStream(file)
-//            val decryptedByteArray = cm.decrypt(fis)
-//
-//            // create temp uri for decrypted file
-//            val tempUri = initTempUri()
-//            val tempFile = tempUri.path?.let { File(it) }
-//            // write decrypted byte array to temp file
-//            tempFile?.writeBytes(decryptedByteArray)
-//            // Decryption Logic End
-
-
             val intent = Intent(Intent.ACTION_VIEW)
+
+            if (encryptionFlag == true) {
+                // decrypt image
+                val decryptedUri = decryptImage(this, File(uri.path.toString()))
+                // set uri to decrypted uri
+                intent.setDataAndType(decryptedUri, "image/*")
+                intent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
+                intent.addFlags(Intent.FLAG_GRANT_WRITE_URI_PERMISSION)
+                return startActivity(intent)
+
+            }
+
             intent.setDataAndType(uri, "image/*")
             startActivity(intent)
         }
@@ -357,6 +421,7 @@ class fileList : AppCompatActivity() {
 //            Toast.makeText(this, "No app found to open this file", Toast.LENGTH_SHORT).show()
 //        }
     }
+
 
 
     fun showCreateFolderDialog() {
@@ -409,30 +474,27 @@ class fileList : AppCompatActivity() {
         recyclerView.adapter = FileListAdapter(files, this)
     }
 
-//    fun encryptFile(file:File){
-//        val masterKey: MasterKey = Builder(context)
-//            .setKeyScheme(MasterKey.KeyScheme.AES256_GCM)
-//            .build()
-//
-//        val file: File = File(context.getFilesDir(), "secret_data")
-//        val encryptedFile = EncryptedFile.Builder(
-//            context,
-//            file,
-//            masterKey,
-//            EncryptedFile.FileEncryptionScheme.AES256_GCM_HKDF_4KB
-//        ).build()
-//
-//        // write to the encrypted file
-//
-//        // write to the encrypted file
-//        val encryptedOutputStream = encryptedFile.openFileOutput()
-//
-//        // read the encrypted file
-//
-//        // read the encrypted file
-//        val encryptedInputStream = encryptedFile.openFileInput()
-//
-//    }
+    // Function to take a file and encrypt it using jetpack security
+    @RequiresApi(Build.VERSION_CODES.O)
+    fun encryptFile(file: File) {
+        val keyAlias = MasterKeys.getOrCreate(MasterKeys.AES256_GCM_SPEC)
+        val encryptedFileLocation = File(file.parent, "encrypted_${file.name}")
+        val encryptedFile =  EncryptedFile.Builder(
+            encryptedFileLocation,
+            this,
+            keyAlias,
+            EncryptedFile.FileEncryptionScheme.AES256_GCM_HKDF_4KB
+        ).build()
+
+        // write to encrypted file
+        encryptedFile.openFileOutput().apply {
+            write(file.readBytes())
+            close()
+        }
+
+    }
+
+
 
     private fun initTempUri(): Uri {
         //gets the temp_images dir
