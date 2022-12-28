@@ -13,9 +13,8 @@ interface ApiInterface {
     @GET("api/users")
     fun getData(): Call<List<UserResponse>>
 
-    @POST("login")
+    @POST("api/login")
     fun verifyUser(@Body UserRequest: Any?): Call<UserResponse>
-
 
     @POST("api/lockOrUnlockUser")
     fun lockUser(@Body UserLockRequest : UserLockRequest): Call<BasicResponse>

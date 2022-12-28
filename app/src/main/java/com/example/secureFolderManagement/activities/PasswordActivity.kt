@@ -7,8 +7,10 @@ import android.util.Log
 import android.widget.TextView
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
+import com.example.secureFolderManagement.LoggingManager
 import com.example.secureFolderManagement.PreferenceManager
 import com.example.secureFolderManagement.R
+import com.example.secureFolderManagement.database.AppDatabase
 import com.example.secureFolderManagement.interfaces.ApiInterface
 import com.example.secureFolderManagement.models.BasicResponse
 import com.example.secureFolderManagement.models.UserLockRequest
@@ -22,6 +24,9 @@ import retrofit2.Response
 
 
 class PasswordActivity : AppCompatActivity() {
+
+    private val LoggingManager = LoggingManager(this)
+
 
     fun toFileManagerActivity(){
         val intent = Intent(this@PasswordActivity, com.example.secureFolderManagement.fileList::class.java)
@@ -96,7 +101,7 @@ class PasswordActivity : AppCompatActivity() {
                             putBoolean("isPinSet", true)
                             commit()
                         }
-                        Toast.makeText(this@PasswordActivity, "Saved Password", Toast.LENGTH_SHORT).show()
+                        LoggingManager.insertLog("Pin Set")
                         Log.v("TEST", enteredText)
                         toFileManagerActivity();
                         return true
@@ -200,6 +205,7 @@ class PasswordActivity : AppCompatActivity() {
                             putBoolean("isLocked", true)
                             commit()
                         }
+                        LoggingManager.insertLog("Locked")
                         lockUser(username.toString())
                         return false
                     }
@@ -209,6 +215,7 @@ class PasswordActivity : AppCompatActivity() {
                             putInt("tries", 0)
                             commit()
                         }
+                        LoggingManager.insertLog("Pin Unlock")
                         toFileManagerActivity();
                         return true
                     } else {
@@ -221,6 +228,7 @@ class PasswordActivity : AppCompatActivity() {
                         }
                         errMsg.visibility = TextView.VISIBLE
                         errMsg.text = "Incorrect Password $tries/$maxTries tries"
+                        LoggingManager.insertLog("Pin Error")
                         return false
                     }
                 }

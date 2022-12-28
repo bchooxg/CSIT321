@@ -44,6 +44,7 @@ import java.util.*
 class fileList : AppCompatActivity() {
 
     // launcher
+    private val LoggingManager = LoggingManager(this)
     private val fileLauncher =
         registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
             if (result.resultCode == Activity.RESULT_OK) {
@@ -144,26 +145,6 @@ class fileList : AppCompatActivity() {
         val file = File(path, fileName)
         val fOut = FileOutputStream(file)
 
-        // encrypt file
-//        encryptFile(file)
-//        // Encryption Logic START
-//        val eFile = File(path, encryptedFileName)
-//        val eFOut = FileOutputStream(eFile)
-//
-//        // turn bitmap to byte array
-//        val byteStream = ByteArrayOutputStream()
-//        bitmap?.compress(Bitmap.CompressFormat.JPEG, 100, byteStream)
-//        val byteArray: ByteArray = byteStream.toByteArray()
-//        // encrypt byte array
-//        val cm =  CryptoManager()
-//        cm.encrypt(byteArray, eFOut)
-//        eFOut.flush()
-//        eFOut.close()
-//
-//        // Encryption Logic END
-        // Encrypt file
-
-
 
 
 
@@ -205,6 +186,7 @@ class fileList : AppCompatActivity() {
                 val sp = getSharedPreferences(resources.getString(R.string.shared_prefs), MODE_PRIVATE)
                 PreferenceManager(sp).logout()
                 val intent = Intent(this, loginActivity::class.java)
+                LoggingManager.insertLog("Logout")
                 startActivity(intent)
                 finish()
                 true
