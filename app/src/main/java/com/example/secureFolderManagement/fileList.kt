@@ -390,6 +390,9 @@ class fileList : AppCompatActivity() {
     }
 
     fun openDirectory(path: String) {
+
+        loggingManager.insertLog("Open Directory" , fileName = path)
+
         val intent = Intent(this, fileList::class.java)
         intent.putExtra("path", path)
         startActivity(intent)
@@ -429,6 +432,8 @@ class fileList : AppCompatActivity() {
         // Check extension of file
         val extension = MimeTypeMap.getFileExtensionFromUrl(uri.toString())
         Log.v("TEST", "Extension: $extension")
+
+        loggingManager.insertLog("Open File", fileName = uri.toString())
 
         val filename = uri?.path?.substringAfterLast("/")
         val encryptionFlag = filename?.startsWith("E_")
