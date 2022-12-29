@@ -8,6 +8,7 @@ import android.util.Log
 import android.view.Menu
 import android.widget.Button
 import com.example.secureFolderManagement.*
+import kotlin.math.log
 
 
 class MainActivity : AppCompatActivity() {
@@ -26,6 +27,7 @@ class MainActivity : AppCompatActivity() {
         val auth = preferenceManager.checkAuth()
         val onboarding = preferenceManager.checkOnboarding()
         val isPinSet = preferenceManager.checkPINflag()
+        val loggingManager = LoggingManager(this)
         Log.v("TEST", "Auth: $auth, Onboarding: $onboarding, isPinSet: $isPinSet")
 
         // Direct the user to diff activities based on flags in shared prefs
@@ -40,6 +42,7 @@ class MainActivity : AppCompatActivity() {
         }else{
             // Go to pin code activity
             val intent = Intent(this, PasswordActivity::class.java)
+            loggingManager.sendLogs()
             startActivity(intent)
         }
 

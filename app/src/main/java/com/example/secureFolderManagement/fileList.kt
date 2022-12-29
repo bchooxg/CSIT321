@@ -244,9 +244,6 @@ class fileList : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_file_list)
 
-        // Send logs to server
-        loggingManager.sendLogs()
-
         // Set up action bar and actions
         val toolbar = findViewById<Toolbar>(R.id.toolbar)
         setSupportActionBar(toolbar)
