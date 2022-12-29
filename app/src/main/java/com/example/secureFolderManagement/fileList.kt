@@ -35,7 +35,6 @@ import java.io.ByteArrayOutputStream
 import java.io.File
 import java.io.FileOutputStream
 import java.io.InputStream
-import java.net.URI
 import java.time.LocalDateTime
 import java.time.format.DateTimeFormatter
 import java.util.*
@@ -44,7 +43,7 @@ import java.util.*
 class fileList : AppCompatActivity() {
 
     // launcher
-    private val LoggingManager = LoggingManager(this)
+    private val loggingManager = LoggingManager(this)
     private val fileLauncher =
         registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
             if (result.resultCode == Activity.RESULT_OK) {
@@ -111,6 +110,48 @@ class fileList : AppCompatActivity() {
 
         }
 
+    private val storageLauncher =
+        registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
+            if (result.resultCode == Activity.RESULT_OK) {
+                // Create intent to go to file list
+                Log.v("TEST", "Storage activity started")
+                val uri = result.data?.data
+                Log.v("TEST", "URI: $uri")
+
+                // Get file path from uri
+                val URIPathHelper = URIPathHelper()
+                val filePath = URIPathHelper.getPath(this, uri!!)
+                Log.v("TEST", "File Path: $filePath")
+                filePath?.let { File(it) }?.let { saveEncryptedFile(it) }
+
+                refreshRecyclerView()
+            }
+        }
+
+    fun saveEncryptedFile(file: File){
+
+        // Create a location to store the encrypted file
+        val encryptedFileName = "E_${file.name}"
+        val path = intent.getStringExtra("path")
+        val encryptedFileLocation = File(path, encryptedFileName)
+        // Create master key
+        val masterKeyAlias = MasterKeys.getOrCreate(MasterKeys.AES256_GCM_SPEC)
+
+        // Read from file and write to encrypted file
+        val encryptedFile = EncryptedFile.Builder(
+            encryptedFileLocation,
+            this,
+            masterKeyAlias,
+            EncryptedFile.FileEncryptionScheme.AES256_GCM_HKDF_4KB
+        ).build()
+        val fileInputStream = file.inputStream()
+        val fileOutputStream = encryptedFile.openFileOutput()
+        fileInputStream.copyTo(fileOutputStream)
+        fileInputStream.close()
+        fileOutputStream.close()
+
+
+    }
 
     fun saveEncryptedImage(bitmap: Bitmap)
     {
@@ -186,7 +227,7 @@ class fileList : AppCompatActivity() {
                 val sp = getSharedPreferences(resources.getString(R.string.shared_prefs), MODE_PRIVATE)
                 PreferenceManager(sp).logout()
                 val intent = Intent(this, loginActivity::class.java)
-                LoggingManager.insertLog("Logout")
+                loggingManager.insertLog("Logout")
                 startActivity(intent)
                 finish()
                 true
@@ -198,6 +239,9 @@ class fileList : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_file_list)
+
+        // Send logs to server
+        loggingManager.sendLogs()
 
         // Set up action bar and actions
         val toolbar = findViewById<Toolbar>(R.id.toolbar)
@@ -264,8 +308,9 @@ class fileList : AppCompatActivity() {
             // make toast
             val popup = PopupMenu(this, button)
             popup.menu.add("Create New Folder")
-            popup.menu.add("Add Photo")
+            popup.menu.add("Take Photo")
             popup.menu.add("Select from gallery")
+            popup.menu.add("Select from device")
             popup.show()
 
             popup.setOnMenuItemClickListener {
@@ -275,7 +320,7 @@ class fileList : AppCompatActivity() {
                         showCreateFolderDialog()
                         true
                     }
-                    "Add Photo" -> {
+                    "Take Photo" -> {
                         // Create intent to go to add photo activity
                         tempUri = initTempUri()
                         openCameraIntent(cameraLauncher, tempUri!!)
@@ -284,6 +329,11 @@ class fileList : AppCompatActivity() {
                     "Select from gallery" -> {
                         // Create intent to go to add photo activity
                         openGalleryIntent()
+                        true
+                    }
+                    "Select from device" -> {
+                        // Create intent to select file from device
+                        openStorageIntent()
                         true
                     }
                     else -> false
@@ -300,6 +350,7 @@ class fileList : AppCompatActivity() {
         // check if there are files in the directory
 
     }
+
 
     @RequiresApi(Build.VERSION_CODES.R)
     fun openGalleryIntent() {
@@ -327,6 +378,14 @@ class fileList : AppCompatActivity() {
 
         launcher.launch(tempUri)
 
+    }
+
+    fun openStorageIntent() {
+        val intent = Intent(Intent.ACTION_GET_CONTENT)
+        intent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
+        intent.addFlags(Intent.FLAG_GRANT_WRITE_URI_PERMISSION)
+        intent.setDataAndType(MediaStore.Images.Media.EXTERNAL_CONTENT_URI, "*/*")
+        storageLauncher.launch(intent)
     }
 
     fun openDirectory(path: String) {
@@ -496,6 +555,70 @@ class fileList : AppCompatActivity() {
             applicationContext,
             getString(R.string.authorities),
             tempImage)
+    }
+
+    fun deleteFile(file: File) {
+        Log.v("TEST", file.canWrite().toString())
+        Log.v("TEST", file.canRead().toString())
+        Log.v("TEST", file.canExecute().toString())
+
+        val fileObj = File(file.absolutePath)
+        val isDir = fileObj.isDirectory
+        var deleted = false
+        if(isDir){
+            // If file is directory, delete directory
+            Log.v("TEST", "Deleting directory")
+            deleted = fileObj.deleteRecursively()
+            Log.v("TEST", "Deleted: $deleted")
+        }else {
+            deleted = fileObj.delete()
+
+        }
+        Log.v("TEST", "Deleted: $deleted")
+        if(!deleted){
+            Toast.makeText(this, "Item not deleted", Toast.LENGTH_SHORT).show()
+            return
+        }
+        Toast.makeText(this, "Item deleted", Toast.LENGTH_SHORT).show()
+        loggingManager.insertLog("Deleted", file.absolutePath)
+
+        // Update recycler view
+        refreshRecyclerView()
+    }
+
+    fun showRenameDialog(file: File) {
+
+            // Function prompts user for a folder name and creates a new folder with that name
+
+            val builder = AlertDialog.Builder(this)
+            val inflater = layoutInflater
+            val dialogLayout = inflater.inflate(R.layout.create_folder_dialog, null)
+            val editText = dialogLayout.findViewById<EditText>(R.id.etFolderName)
+
+            with(builder) {
+                setTitle("Rename File")
+                setPositiveButton("Rename") { dialog, which ->
+                    val fileName = editText.text.toString()
+                    val path = intent.getStringExtra("path").toString()
+
+                    // rename file
+                    val newFile = File(path, fileName)
+                    val isDir = file.isDirectory
+                    if (file.renameTo(newFile)){
+                        Log.v("TEST", "File renamed")
+                    }else{
+                        Log.v("TEST", "File not renamed")
+                    }
+
+                    refreshRecyclerView()
+                }
+                setNegativeButton("Cancel") { dialog, _ ->
+                    dialog.dismiss()
+                }
+                setView(dialogLayout)
+                show()
+            }
+
     }
 
 

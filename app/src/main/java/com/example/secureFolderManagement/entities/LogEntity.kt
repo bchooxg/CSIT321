@@ -5,7 +5,7 @@ import androidx.room.Entity
 import androidx.room.PrimaryKey
 
 @Entity(tableName = "log")
-data class Log(
+data class LogEntity(
 
     @PrimaryKey(autoGenerate = true)
     val id: Int?,

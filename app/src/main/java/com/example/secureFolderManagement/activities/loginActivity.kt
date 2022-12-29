@@ -29,6 +29,7 @@ import retrofit2.converter.gson.GsonConverterFactory
 class loginActivity : AppCompatActivity() {
 
     private lateinit var appDb : AppDatabase
+    private val loggingManager = LoggingManager(this)
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -49,32 +50,6 @@ class loginActivity : AppCompatActivity() {
 
         //
     }
-
-//    fun insertLog(){
-//
-//        // get username from shared preferences
-//        val sp = getSharedPreferences(resources.getString(R.string.shared_prefs), MODE_PRIVATE)
-//        val username = sp.getString("username", "")
-//
-//        if (username == null) {
-//            Log.d("loginActivity", "username is null")
-//            return
-//        }
-//        val isoDateTime = java.time.LocalDateTime.now().toString()
-//        val log = com.example.secureFolderManagement.entities.Log(
-//            id = null,
-//            username = username,
-//            action = "login",
-//            timestamp = isoDateTime,
-//            fileName = null
-//        )
-//
-//        GlobalScope.launch(Dispatchers.IO) {
-//            appDb = AppDatabase.getInstance(this@loginActivity)
-//            appDb.logDAO().insertLog(log)
-//        }
-//
-//    }
 
     fun getUsers(){
         val retrofit = Retrofit.Builder()
@@ -150,7 +125,7 @@ class loginActivity : AppCompatActivity() {
     fun authenticateUser(username: String){
         val sp = getSharedPreferences(resources.getString(R.string.shared_prefs), MODE_PRIVATE)
         PreferenceManager(sp).setAuth(username)
-        val loggingManager = LoggingManager(this)
+
         loggingManager.insertLog("Login")
     }
 

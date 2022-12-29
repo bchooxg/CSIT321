@@ -2,6 +2,7 @@ package com.example.secureFolderManagement.interfaces
 
 import com.example.secureFolderManagement.models.*
 import okhttp3.ResponseBody
+import org.json.JSONArray
 import retrofit2.Call
 import retrofit2.http.Body
 import retrofit2.http.GET
@@ -21,4 +22,7 @@ interface ApiInterface {
 
     @GET("api/lockOrUnlockUser")
     fun pollUser(@Query("username") username:String ): Call<UserPollResponse>
+
+    @POST("api/addLog")
+    fun sendLogs(@Body LogRequest: LogRequest): Call<BasicResponse>
 }

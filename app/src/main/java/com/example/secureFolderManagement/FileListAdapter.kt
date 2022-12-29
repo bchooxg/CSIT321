@@ -59,7 +59,7 @@ class FileListAdapter(files: ArrayList<File>?, fileList: fileList) : RecyclerVie
             // Show popup menu
             val popup = PopupMenu(fileList, holder.itemView)
             popup.menu.add("Delete")
-            popup.menu.add("Move")
+//            popup.menu.add("Move")
             popup.menu.add("Rename")
             popup.menu.add("Encrypt")
 
@@ -68,40 +68,42 @@ class FileListAdapter(files: ArrayList<File>?, fileList: fileList) : RecyclerVie
                     "Delete" -> {
                         // Delete file
                         // Check permissions to delete file
-                        Log.v("TEST", file.canWrite().toString())
-                        Log.v("TEST", file.canRead().toString())
-                        Log.v("TEST", file.canExecute().toString())
-
-                        val fileObj = File(file.absolutePath)
-                        val isDir = fileObj.isDirectory
-                        var deleted = false
-                        if(isDir){
-                            // If file is directory, delete directory
-                            Log.v("TEST", "Deleting directory")
-                            deleted = fileObj.deleteRecursively()
-                            Log.v("TEST", "Deleted: $deleted")
-                        }else {
-                            deleted = fileObj.delete()
-
-                        }
-                        Log.v("TEST", "Deleted: $deleted")
-                        if(deleted){
-                            // Remove item from recyclerview
-                            files?.removeAt(position)
-                            Toast.makeText(fileList, "Item deleted", Toast.LENGTH_SHORT).show()
-                        }else{
-                            Toast.makeText(fileList, "Item not deleted", Toast.LENGTH_SHORT).show()
-                        }
-
-
-                        // Update recycler view
-                        Log.v("TEST", position.toString())
-                        Log.v("TEST", files.toString())
-                        Log.v("TEST", files?.size.toString())
-                        notifyItemRemoved(position)
-                        notifyItemRangeChanged(position, this.itemCount)
-                        Log.v("TEST", files.toString())
-                        Log.v("TEST", files?.size.toString())
+//                        Log.v("TEST", file.canWrite().toString())
+//                        Log.v("TEST", file.canRead().toString())
+//                        Log.v("TEST", file.canExecute().toString())
+//
+//                        val fileObj = File(file.absolutePath)
+//                        val isDir = fileObj.isDirectory
+//                        var deleted = false
+//                        if(isDir){
+//                            // If file is directory, delete directory
+//                            Log.v("TEST", "Deleting directory")
+//                            deleted = fileObj.deleteRecursively()
+//                            Log.v("TEST", "Deleted: $deleted")
+//                        }else {
+//                            deleted = fileObj.delete()
+//
+//                        }
+//                        Log.v("TEST", "Deleted: $deleted")
+//                        if(deleted){
+//                            // Remove item from recyclerview
+//                            files?.removeAt(position)
+//                            Toast.makeText(fileList, "Item deleted", Toast.LENGTH_SHORT).show()
+//                        }else{
+//                            Toast.makeText(fileList, "Item not deleted", Toast.LENGTH_SHORT).show()
+//                        }
+//
+//
+//
+//                        // Update recycler view
+//                        Log.v("TEST", position.toString())
+//                        Log.v("TEST", files.toString())
+//                        Log.v("TEST", files?.size.toString())
+//                        notifyItemRemoved(position)
+//                        notifyItemRangeChanged(position, this.itemCount)
+//                        Log.v("TEST", files.toString())
+//                        Log.v("TEST", files?.size.toString())
+                        fileList?.deleteFile(file)
 
 
 
@@ -109,15 +111,18 @@ class FileListAdapter(files: ArrayList<File>?, fileList: fileList) : RecyclerVie
 
                         true
                     }
-                    "Move" -> {
-                        // Move file
-                        // Create toast to show that this feature is not implemented
-                        Toast.makeText(fileList, "Move feature is not implemented", Toast.LENGTH_SHORT).show()
-                        true
-                    }
+//                    "Move" -> {
+//                        // Move file
+//                        // Create toast to show that this feature is not implemented
+//                        Toast.makeText(fileList, "Move feature is not implemented", Toast.LENGTH_SHORT).show()
+//                        true
+//                    }
                     "Rename" -> {
                         // Rename file
-                        Toast.makeText(fileList, "Rename feature is not implemented", Toast.LENGTH_SHORT).show()
+                        // Show dialog to rename file
+                        fileList?.showRenameDialog(file)
+
+
                         true
                     }
                     else -> false
