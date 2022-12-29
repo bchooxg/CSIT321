@@ -38,7 +38,6 @@ import java.io.InputStream
 import java.time.LocalDateTime
 import java.time.format.DateTimeFormatter
 import java.util.*
-import kotlin.math.log
 
 
 class fileList : AppCompatActivity() {
@@ -150,6 +149,7 @@ class fileList : AppCompatActivity() {
         fileInputStream.copyTo(fileOutputStream)
         fileInputStream.close()
         fileOutputStream.close()
+        loggingManager.insertLog("Saved File", file.absolutePath)
 
 
     }
@@ -174,6 +174,7 @@ class fileList : AppCompatActivity() {
         encryptedFile.openFileOutput().use {
             it.write(bitmapData)
         }
+        loggingManager.insertLog("Saved File", file.absolutePath)
     }
 
 
@@ -202,6 +203,8 @@ class fileList : AppCompatActivity() {
         // make toast
         Toast.makeText(this, "Image saved", Toast.LENGTH_SHORT).show()
         refreshRecyclerView()
+        loggingManager.insertLog("Saved File", file.absolutePath)
+
     }
 
     // Set up menu for toolbar
@@ -318,7 +321,7 @@ class fileList : AppCompatActivity() {
                 when (it.title) {
                     "Create New Folder" -> {
                         // create dialog with edit text
-                        showCreateFolderDialog()
+                        createDirectory()
                         true
                     }
                     "Take Photo" -> {
@@ -471,40 +474,7 @@ class fileList : AppCompatActivity() {
 
 
 
-    fun showCreateFolderDialog() {
 
-        // Function prompts user for a folder name and creates a new folder with that name
-
-        val builder = AlertDialog.Builder(this)
-        val inflater = layoutInflater
-        val dialogLayout = inflater.inflate(R.layout.create_folder_dialog, null)
-        val editText = dialogLayout.findViewById<EditText>(R.id.etFolderName)
-
-        with(builder) {
-            setTitle("Create New Folder")
-            setPositiveButton("Create") { dialog, which ->
-                val folderName = editText.text.toString()
-                val path = intent.getStringExtra("path").toString()
-                val file = File(path, folderName)
-                if (file.mkdir()) {
-                    Toast.makeText(this@fileList, "Folder created", Toast.LENGTH_SHORT).show()
-                    // refresh recyclerview
-//                    val recyclerView = findViewById<RecyclerView>(R.id.rvFilesList)
-//                    val files = File(path).listFiles()?.toCollection(ArrayList())
-//                    recyclerView.adapter = FileListAdapter(files, this@fileList)
-                    refreshRecyclerView()
-
-                } else {
-                    Toast.makeText(this@fileList, "Folder not created", Toast.LENGTH_SHORT).show()
-                }
-            }
-            setNegativeButton("Cancel") { dialog, _ ->
-                dialog.dismiss()
-            }
-            setView(dialogLayout)
-            show()
-        }
-    }
 
     fun refreshRecyclerView() {
         val recyclerView = findViewById<RecyclerView>(R.id.rvFilesList)
@@ -561,6 +531,41 @@ class fileList : AppCompatActivity() {
             applicationContext,
             getString(R.string.authorities),
             tempImage)
+    }
+    fun createDirectory() {
+
+        // Function prompts user for a folder name and creates a new folder with that name
+
+        val builder = AlertDialog.Builder(this)
+        val inflater = layoutInflater
+        val dialogLayout = inflater.inflate(R.layout.create_folder_dialog, null)
+        val editText = dialogLayout.findViewById<EditText>(R.id.etFolderName)
+
+        with(builder) {
+            setTitle("Create New Folder")
+            setPositiveButton("Create") { dialog, which ->
+                val folderName = editText.text.toString()
+                val path = intent.getStringExtra("path").toString()
+                val file = File(path, folderName)
+                if (file.mkdir()) {
+                    Toast.makeText(this@fileList, "Folder created", Toast.LENGTH_SHORT).show()
+                    // refresh recyclerview
+//                    val recyclerView = findViewById<RecyclerView>(R.id.rvFilesList)
+//                    val files = File(path).listFiles()?.toCollection(ArrayList())
+//                    recyclerView.adapter = FileListAdapter(files, this@fileList)
+                    refreshRecyclerView()
+                    loggingManager.insertLog("Create Directory", fileName = file.absolutePath)
+
+                } else {
+                    Toast.makeText(this@fileList, "Folder not created", Toast.LENGTH_SHORT).show()
+                }
+            }
+            setNegativeButton("Cancel") { dialog, _ ->
+                dialog.dismiss()
+            }
+            setView(dialogLayout)
+            show()
+        }
     }
 
     fun delete(file: File) {
