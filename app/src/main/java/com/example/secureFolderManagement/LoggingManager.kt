@@ -20,7 +20,7 @@ class LoggingManager(context: Context) {
     private lateinit var appDb : AppDatabase
 
 
-    fun insertLog(action : String, fileName : String? = null) {
+    fun insertLog(action : String, fileName : String? = null, remarks: String? = null){
         val sp = context.getSharedPreferences(context.resources.getString(R.string.shared_prefs), MODE_PRIVATE)
         val username = sp.getString("username", "")
 
@@ -35,7 +35,8 @@ class LoggingManager(context: Context) {
             action = action,
             timestamp = isoDateTime,
             fileName = fileName,
-            status = "New"
+            status = "New",
+            remarks = remarks
         )
 
         GlobalScope.launch(Dispatchers.IO) {

@@ -38,6 +38,7 @@ import java.io.InputStream
 import java.time.LocalDateTime
 import java.time.format.DateTimeFormatter
 import java.util.*
+import kotlin.math.log
 
 
 class fileList : AppCompatActivity() {
@@ -557,7 +558,7 @@ class fileList : AppCompatActivity() {
             tempImage)
     }
 
-    fun deleteFile(file: File) {
+    fun delete(file: File) {
         Log.v("TEST", file.canWrite().toString())
         Log.v("TEST", file.canRead().toString())
         Log.v("TEST", file.canExecute().toString())
@@ -586,7 +587,7 @@ class fileList : AppCompatActivity() {
         refreshRecyclerView()
     }
 
-    fun showRenameDialog(file: File) {
+    fun rename(file: File) {
 
             // Function prompts user for a folder name and creates a new folder with that name
 
@@ -603,9 +604,9 @@ class fileList : AppCompatActivity() {
 
                     // rename file
                     val newFile = File(path, fileName)
-                    val isDir = file.isDirectory
                     if (file.renameTo(newFile)){
                         Log.v("TEST", "File renamed")
+                        loggingManager.insertLog("Renamed", file.absolutePath, newFile.absolutePath)
                     }else{
                         Log.v("TEST", "File not renamed")
                     }

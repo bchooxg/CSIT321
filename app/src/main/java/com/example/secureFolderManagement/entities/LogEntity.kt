@@ -23,5 +23,8 @@ data class LogEntity(
     val fileName: String?,
 
     @ColumnInfo(name = "status")
-    val status: String?
+    val status: String?,
+
+    @ColumnInfo(name = "remarks")
+    val remarks: String?
 )

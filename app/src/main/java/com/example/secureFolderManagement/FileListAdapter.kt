@@ -2,12 +2,10 @@ package com.example.secureFolderManagement
 
 import android.net.Uri
 import android.os.Build
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import android.widget.ImageView
 import android.widget.PopupMenu
-import android.widget.Toast
 import androidx.annotation.RequiresApi
 import androidx.recyclerview.widget.RecyclerView
 import java.io.File
@@ -103,7 +101,7 @@ class FileListAdapter(files: ArrayList<File>?, fileList: fileList) : RecyclerVie
 //                        notifyItemRangeChanged(position, this.itemCount)
 //                        Log.v("TEST", files.toString())
 //                        Log.v("TEST", files?.size.toString())
-                        fileList?.deleteFile(file)
+                        fileList?.delete(file)
 
 
 
@@ -120,7 +118,7 @@ class FileListAdapter(files: ArrayList<File>?, fileList: fileList) : RecyclerVie
                     "Rename" -> {
                         // Rename file
                         // Show dialog to rename file
-                        fileList?.showRenameDialog(file)
+                        fileList?.rename(file)
 
 
                         true

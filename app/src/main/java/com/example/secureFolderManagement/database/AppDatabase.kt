@@ -7,7 +7,7 @@ import androidx.room.RoomDatabase
 import com.example.secureFolderManagement.entities.LogEntity
 import com.example.secureFolderManagement.interfaces.LogDAO
 
-@Database(entities = [LogEntity::class], version = 2, exportSchema = false)
+@Database(entities = [LogEntity::class], version = 3, exportSchema = false)
 abstract class AppDatabase: RoomDatabase() {
 
     abstract fun logDAO(): LogDAO
