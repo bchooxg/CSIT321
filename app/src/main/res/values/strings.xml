@@ -5,7 +5,7 @@
     <string name="button_takePicture">Take Picture</string>
     <string name="temp_images_dir">temp_images</string>
     <string name="temp_image">temp_image.jpg</string>
-    <string name="authorities">com.example.secureFolderManagement.fileprovider</string>
+    <string name="authorities">com.SFM.secureFolderManagement.fileprovider</string>
     <string name="title_activity_intro">IntroActivity</string>
     <string name="server_url">https://securefolderwebserver.onrender.com</string>
     <!-- Strings used for fragments for navigation -->
