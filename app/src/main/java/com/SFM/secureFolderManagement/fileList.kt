@@ -219,9 +219,6 @@ class fileList : AppCompatActivity() {
         return when (item.itemId) {
             R.id.ab_option_settings -> {
                 // Create intent to go to settings
-//                val intent = Intent(this, settings::class.java)
-//                startActivity(intent)
-                Toast.makeText(this, "Option 1 Clicked", Toast.LENGTH_SHORT).show()
                 val intent = Intent(this, SettingsActivity::class.java)
                 startActivity(intent)
                 true
