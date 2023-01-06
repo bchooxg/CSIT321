@@ -7,6 +7,8 @@ import android.util.Log
 import android.widget.TextView
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
+import androidx.biometric.BiometricPrompt
+import androidx.core.content.ContextCompat
 import com.SFM.secureFolderManagement.LoggingManager
 import com.SFM.secureFolderManagement.PreferenceManager
 import com.SFM.secureFolderManagement.R
@@ -170,14 +172,50 @@ class PasswordActivity : AppCompatActivity() {
             val errMsg = findViewById<TextView>(R.id.tv_pinScreen_error)
             val sp = getSharedPreferences(resources.getString(R.string.shared_prefs), MODE_PRIVATE)
             var maxTries = sp.getInt("pinMaxTries", 5)
+            val requireBioMetrics = sp.getBoolean("requireBioMetrics", false)
             var tries = sp.getInt("tries", 0)
             var username = sp.getString("username", "")
             var isLocked = sp.getBoolean("isLocked", false)
             val pinLength = sp.getInt("minPass", 4)
 
+            // create biometric prompt
+            val executor = ContextCompat.getMainExecutor(this)
+            val biometricPrompt = BiometricPrompt(this, executor,
+                object : BiometricPrompt.AuthenticationCallback() {
+                    override fun onAuthenticationError(errorCode: Int, errString: CharSequence) {
+                        super.onAuthenticationError(errorCode, errString)
+                        Toast.makeText(applicationContext,
+                            "Authentication error: $errString", Toast.LENGTH_SHORT)
+                            .show()
+                    }
+
+                    override fun onAuthenticationSucceeded(result: BiometricPrompt.AuthenticationResult) {
+                        super.onAuthenticationSucceeded(result)
+                        Toast.makeText(applicationContext,
+                            "Authentication succeeded!", Toast.LENGTH_SHORT)
+                            .show()
+                        toFileManagerActivity()
+                    }
+
+                    override fun onAuthenticationFailed() {
+                        super.onAuthenticationFailed()
+                        Toast.makeText(applicationContext, "Authentication failed",
+                            Toast.LENGTH_SHORT)
+                            .show()
+                    }
+                })
+            biometricPrompt.authenticate(
+                BiometricPrompt.PromptInfo.Builder()
+                    .setTitle("Biometric login for Secure File Manager")
+                    .setSubtitle("Log in using your biometric credential")
+                    .setNegativeButtonText("Cancel")
+                    .build())
+
+
+
+
             // Set pin length
             circleField.numberOfFields = pinLength.toInt()
-
 
 
             tv.text = "Please enter your password"
