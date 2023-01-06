@@ -1,25 +1,36 @@
-<PreferenceScreen xmlns:app="http://schemas.android.com/apk/res-auto">
+<PreferenceScreen xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:android="http://schemas.android.com/apk/res/android">
 
-    <PreferenceCategory app:title="Current Password">
+    <PreferenceCategory app:title="Passwords">
 
-        <EditTextPreference
-            app:key="password"
-            app:title="Password"
-            app:useSimpleSummaryProvider="true" />
+        <Preference
+            app:key="change_pin"
+            app:title="Change Password">
+
+        </Preference>
 
     </PreferenceCategory>
 
-    <PreferenceCategory app:title="Passwords Settings">
+    <PreferenceCategory app:title="Additional Settings">
 
         <SwitchPreferenceCompat
-            app:key="changePwd"
-            app:title="Request to change password every 6 months" />
+            app:key="isBioAuthEnabled"
+            app:title="Enable Biometric Authentication" />
 
-        <SwitchPreferenceCompat
-            app:key="lockAcc"
-            app:summaryOff="Take note that your account will be locked and no access will not be available"
-            app:summaryOn="Take note that your account will be unlocked"
-            app:title="Lock Account" />
+        <Preference
+            app:key="check_compliance"
+            app:title="Check Compliance">
+
+        </Preference>
+<!--        <SwitchPreferenceCompat-->
+<!--            app:key="changePwd"-->
+<!--            app:title="Request to change password every 6 months" />-->
+
+<!--        <SwitchPreferenceCompat-->
+<!--            app:key="lockAcc"-->
+<!--            app:summaryOff="Take note that your account will be locked and no access will not be available"-->
+<!--            app:summaryOn="Take note that your account will be unlocked"-->
+<!--            app:title="Lock Account" />-->
 
     </PreferenceCategory>
 
