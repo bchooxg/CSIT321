@@ -178,9 +178,7 @@ class PasswordActivity : AppCompatActivity() {
             var isLocked = sp.getBoolean("isLocked", false)
             val pinLength = sp.getInt("minPass", 4)
 
-            // todo check flag for biometrics
             // create biometric prompt
-
             if( isBioAuthEnabled){
                 val executor = ContextCompat.getMainExecutor(this)
                 val biometricPrompt = BiometricPrompt(this, executor,
