@@ -8,6 +8,7 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.preference.Preference
 import androidx.preference.PreferenceFragmentCompat
 import androidx.preference.PreferenceManager.getDefaultSharedPreferences
+import com.SFM.secureFolderManagement.activities.ComplianceChecker
 import com.SFM.secureFolderManagement.activities.PasswordActivity
 
 
@@ -33,6 +34,7 @@ class SettingsFragment : PreferenceFragmentCompat() {
     override fun onCreatePreferences(savedInstanceState: Bundle?, rootKey: String?) {
         setPreferencesFromResource(R.xml.root_preferences, rootKey)
 
+        // to send user to pin code activity
         val preference: Preference? = findPreference("change_pin")
         preference?.setOnPreferenceClickListener {
             context?.let { it1 -> getDefaultSharedPreferences(it1).edit().putBoolean("isPinSet", false).apply() }
@@ -40,6 +42,15 @@ class SettingsFragment : PreferenceFragmentCompat() {
             startActivity(intent)
             true
         }
+
+        // to send user to compliance checker activity
+        val preference2: Preference? = findPreference("check_compliance")
+        preference2?.setOnPreferenceClickListener {
+            val intent = Intent(context, ComplianceChecker::class.java)
+            startActivity(intent)
+            true
+        }
+
 
     }
 }

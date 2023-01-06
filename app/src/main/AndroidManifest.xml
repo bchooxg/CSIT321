@@ -16,6 +16,13 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.FirstApp">
         <activity
+            android:name=".activities.ComplianceChecker"
+            android:exported="false">
+            <meta-data
+                android:name="android.app.lib_name"
+                android:value="" />
+        </activity>
+        <activity
             android:name=".SettingsActivity"
             android:exported="false">
             <meta-data
@@ -32,8 +39,7 @@
         </activity>
         <activity
             android:name=".activities.IntroActivity"
-            android:label="My Custom AppIntro"
-            />
+            android:label="My Custom AppIntro" />
         <activity
             android:name=".fileList"
             android:exported="false">

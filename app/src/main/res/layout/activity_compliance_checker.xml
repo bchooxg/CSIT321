@@ -1,0 +1,68 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context=".activities.ComplianceChecker">
+
+    <TextView
+        android:id="@+id/tv_header_required"
+        android:layout_width="136dp"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="84dp"
+        android:text="Requried"
+        android:textAlignment="center"
+        app:layout_constraintStart_toEndOf="@+id/tv_header_permissions"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <TextView
+        android:id="@+id/tv_bio_required"
+        android:layout_width="136dp"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="28dp"
+        android:text="Requried"
+        android:textAlignment="center"
+        app:layout_constraintStart_toEndOf="@+id/tv_bio_permission"
+        app:layout_constraintTop_toBottomOf="@+id/tv_header_required" />
+
+    <TextView
+        android:id="@+id/tv_bio_current"
+        android:layout_width="136dp"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="28dp"
+        android:text="current"
+        android:textAlignment="center"
+        app:layout_constraintStart_toEndOf="@+id/tv_bio_required"
+        app:layout_constraintTop_toBottomOf="@+id/tv_header_current" />
+
+    <TextView
+        android:id="@+id/tv_header_permissions"
+        android:layout_width="135dp"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="84dp"
+        android:text="Permission"
+        android:textAlignment="center"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <TextView
+        android:id="@+id/tv_bio_permission"
+        android:layout_width="135dp"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="28dp"
+        android:text="Biometrics"
+        android:textAlignment="center"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/tv_header_permissions" />
+
+    <TextView
+        android:id="@+id/tv_header_current"
+        android:layout_width="136dp"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="84dp"
+        android:text="Current"
+        android:textAlignment="center"
+        app:layout_constraintStart_toEndOf="@+id/tv_header_required"
+        app:layout_constraintTop_toTopOf="parent" />
+</androidx.constraintlayout.widget.ConstraintLayout>
