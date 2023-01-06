@@ -7,12 +7,13 @@ import retrofit2.Call
 import retrofit2.http.Body
 import retrofit2.http.GET
 import retrofit2.http.POST
+import retrofit2.http.Path
 import retrofit2.http.Query
 
 interface ApiInterface {
 
-    @GET("api/users")
-    fun getData(): Call<List<UserResponse>>
+    @GET("api/users/{username}")
+    fun pollUserDetails( @Path("username") username: String): Call<UserResponse>
 
     @POST("api/login")
     fun verifyUser(@Body UserRequest: Any?): Call<UserResponse>

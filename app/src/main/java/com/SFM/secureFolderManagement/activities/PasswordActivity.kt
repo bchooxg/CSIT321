@@ -17,6 +17,7 @@ import com.SFM.secureFolderManagement.interfaces.ApiInterface
 import com.SFM.secureFolderManagement.models.BasicResponse
 import com.SFM.secureFolderManagement.models.UserLockRequest
 import com.SFM.secureFolderManagement.models.UserPollResponse
+import com.SFM.secureFolderManagement.models.UserResponse
 import com.SFM.secureFolderManagement.services.ServiceBuilder
 import com.poovam.pinedittextfield.CirclePinField
 import com.poovam.pinedittextfield.PinField
@@ -167,6 +168,7 @@ class PasswordActivity : AppCompatActivity() {
 
         // Confirm Password Flow
         fun confirmPassword(pin: String) {
+
             val circleField = findViewById<CirclePinField>(R.id.circleField)
             val tv = findViewById<TextView>(R.id.tv_pinScreen_header)
             val errMsg = findViewById<TextView>(R.id.tv_pinScreen_error)
@@ -177,6 +179,7 @@ class PasswordActivity : AppCompatActivity() {
             var username = sp.getString("username", "")
             var isLocked = sp.getBoolean("isLocked", false)
             val pinLength = sp.getInt("minPass", 4)
+            pollUserDetails(username.toString())
 
             // create biometric prompt
             if( isBioAuthEnabled){
@@ -331,6 +334,32 @@ class PasswordActivity : AppCompatActivity() {
         })
     }
 
+    // function that sends a request to server to poll the user and update shared preferences
+    fun pollUserDetails(username: String){
+        Log.v("TEST", "Inside Poll User Details")
+        val apiInterface = ServiceBuilder.buildService(ApiInterface::class.java)
+        val requestCall = apiInterface.pollUserDetails(username)
+        requestCall.enqueue(object : Callback<UserResponse> {
+            override fun onResponse(
+                call: Call<UserResponse>,
+                response: Response<UserResponse>) {
+                if (response.isSuccessful) {
+                    val res = response.body()
+                    if (res != null) {
+                        Log.v("TEST", res.toString())
+                    }
+                }else{
+                    Log.v("TEST", "Response not successful")
+                }
+            }
+
+            override fun onFailure(call: Call<UserResponse>, t: Throwable) {
+                Log.v("TEST", "Failed to send request to server")
+                Log.v("TEST", t.toString())
+
+            }
+        })
+    }
     // Function that sends a request to server to find out if the user account is locked
 
 }

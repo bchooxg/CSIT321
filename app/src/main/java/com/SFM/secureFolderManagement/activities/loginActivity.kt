@@ -46,33 +46,6 @@ class loginActivity : AppCompatActivity() {
             verifyUser(userNameEntered, passwordEntered)
         })
 
-
-
-        //
-    }
-
-    fun getUsers(){
-        val retrofit = Retrofit.Builder()
-            .addConverterFactory(GsonConverterFactory.create())
-            .baseUrl(resources.getString(R.string.server_url))
-            .build()
-            .create(ApiInterface::class.java)
-        val retrofitData = retrofit.getData()
-        retrofitData.enqueue(object : Callback<List<UserResponse>?> {
-            override fun onResponse(
-                call: Call<List<UserResponse>?>,
-                response: Response<List<UserResponse>?>
-            ) {
-                val body = response.body()
-                for (data in body!!){
-                    Log.v("TEST", "Username: ${data.username}}")
-                }
-            }
-
-            override fun onFailure(call: Call<List<UserResponse>?>, t: Throwable) {
-                Log.v("TEST", "Error: ${t.message}")
-            }
-        })
     }
 
     fun verifyUser(username:String, password:String){
