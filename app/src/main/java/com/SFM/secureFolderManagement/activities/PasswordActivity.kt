@@ -172,44 +172,49 @@ class PasswordActivity : AppCompatActivity() {
             val errMsg = findViewById<TextView>(R.id.tv_pinScreen_error)
             val sp = getSharedPreferences(resources.getString(R.string.shared_prefs), MODE_PRIVATE)
             var maxTries = sp.getInt("pinMaxTries", 5)
-            val requireBioMetrics = sp.getBoolean("requireBioMetrics", false)
+            val isBioAuthEnabled = sp.getBoolean("isBioAuthEnabled", false)
             var tries = sp.getInt("tries", 0)
             var username = sp.getString("username", "")
             var isLocked = sp.getBoolean("isLocked", false)
             val pinLength = sp.getInt("minPass", 4)
 
+            // todo check flag for biometrics
             // create biometric prompt
-            val executor = ContextCompat.getMainExecutor(this)
-            val biometricPrompt = BiometricPrompt(this, executor,
-                object : BiometricPrompt.AuthenticationCallback() {
-                    override fun onAuthenticationError(errorCode: Int, errString: CharSequence) {
-                        super.onAuthenticationError(errorCode, errString)
-                        Toast.makeText(applicationContext,
-                            "Authentication error: $errString", Toast.LENGTH_SHORT)
-                            .show()
-                    }
 
-                    override fun onAuthenticationSucceeded(result: BiometricPrompt.AuthenticationResult) {
-                        super.onAuthenticationSucceeded(result)
-                        Toast.makeText(applicationContext,
-                            "Authentication succeeded!", Toast.LENGTH_SHORT)
-                            .show()
-                        toFileManagerActivity()
-                    }
+            if( isBioAuthEnabled){
+                val executor = ContextCompat.getMainExecutor(this)
+                val biometricPrompt = BiometricPrompt(this, executor,
+                    object : BiometricPrompt.AuthenticationCallback() {
+                        override fun onAuthenticationError(errorCode: Int, errString: CharSequence) {
+                            super.onAuthenticationError(errorCode, errString)
+                            Toast.makeText(applicationContext,
+                                "Authentication error: $errString", Toast.LENGTH_SHORT)
+                                .show()
+                        }
 
-                    override fun onAuthenticationFailed() {
-                        super.onAuthenticationFailed()
-                        Toast.makeText(applicationContext, "Authentication failed",
-                            Toast.LENGTH_SHORT)
-                            .show()
-                    }
-                })
-            biometricPrompt.authenticate(
-                BiometricPrompt.PromptInfo.Builder()
-                    .setTitle("Biometric login for Secure File Manager")
-                    .setSubtitle("Log in using your biometric credential")
-                    .setNegativeButtonText("Cancel")
-                    .build())
+                        override fun onAuthenticationSucceeded(result: BiometricPrompt.AuthenticationResult) {
+                            super.onAuthenticationSucceeded(result)
+                            Toast.makeText(applicationContext,
+                                "Authentication succeeded!", Toast.LENGTH_SHORT)
+                                .show()
+                            toFileManagerActivity()
+                        }
+
+                        override fun onAuthenticationFailed() {
+                            super.onAuthenticationFailed()
+                            Toast.makeText(applicationContext, "Authentication failed",
+                                Toast.LENGTH_SHORT)
+                                .show()
+                        }
+                    })
+                biometricPrompt.authenticate(
+                    BiometricPrompt.PromptInfo.Builder()
+                        .setTitle("Biometric login for Secure File Manager")
+                        .setSubtitle("Log in using your biometric credential")
+                        .setNegativeButtonText("Cancel")
+                        .build())
+            }
+
 
 
 

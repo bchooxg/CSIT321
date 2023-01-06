@@ -12,6 +12,10 @@
     <PreferenceCategory app:title="Passwords Settings">
 
         <SwitchPreferenceCompat
+            app:key="isBioAuthEnabled"
+            app:title="Enable Biometric Authentication" />
+
+        <SwitchPreferenceCompat
             app:key="changePwd"
             app:title="Request to change password every 6 months" />
 
