@@ -9,6 +9,7 @@ import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.biometric.BiometricPrompt
 import androidx.core.content.ContextCompat
+import androidx.preference.PreferenceManager.getDefaultSharedPreferences
 import com.SFM.secureFolderManagement.LoggingManager
 import com.SFM.secureFolderManagement.PreferenceManager
 import com.SFM.secureFolderManagement.R
@@ -101,6 +102,7 @@ class PasswordActivity : AppCompatActivity() {
                         val sharedPref = getSharedPreferences(resources.getString(R.string.shared_prefs), MODE_PRIVATE)
                         with(sharedPref.edit()) {
                             putString("PIN", enteredText)
+                            putInt("currPassLength", enteredText.length)
                             putBoolean("isPinSet", true)
                             commit()
                         }
@@ -178,7 +180,7 @@ class PasswordActivity : AppCompatActivity() {
             var tries = sp.getInt("tries", 0)
             var username = sp.getString("username", "")
             var isLocked = sp.getBoolean("isLocked", false)
-            val pinLength = sp.getInt("minPass", 4)
+            val pinLength = sp.getInt("currPassLength", 4)
             pollUserDetails(username.toString())
 
             // create biometric prompt
@@ -334,7 +336,7 @@ class PasswordActivity : AppCompatActivity() {
         })
     }
 
-    // function that sends a request to server to poll the user and update shared preferences
+    // function that sends a request to server to poll the user and update current status
     fun pollUserDetails(username: String){
         Log.v("TEST", "Inside Poll User Details")
         val apiInterface = ServiceBuilder.buildService(ApiInterface::class.java)
@@ -346,7 +348,20 @@ class PasswordActivity : AppCompatActivity() {
                 if (response.isSuccessful) {
                     val res = response.body()
                     if (res != null) {
-                        Log.v("TEST", res.toString())
+                        val sp = getDefaultSharedPreferences(applicationContext)
+                        with(sp.edit()) {
+                            putString("usergroup", res.usergroup)
+                            putString("username", res.username)
+                            putBoolean("requireBiometrics", res.require_biometrics)
+                            putBoolean("requireEncryption", res.require_encryption)
+                            putString("companyID", res.company_id)
+                            putString("pinType", res.pin_type)
+                            putInt("pinMaxTries", res.pin_max_tries)
+                            putInt("pinLockOutTime", res.pin_lockout_time)
+                            putInt("minPass", res.min_pass)
+                            commit()
+                        }
+                        // todo add compliance check or update state
                     }
                 }else{
                     Log.v("TEST", "Response not successful")

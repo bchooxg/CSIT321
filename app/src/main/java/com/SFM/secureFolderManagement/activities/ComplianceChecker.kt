@@ -17,8 +17,14 @@ class ComplianceChecker : AppCompatActivity() {
         val bio_required = sp.getBoolean("requireBiometrics", false)
         val isBioAuth = sp.getBoolean("isBioAuthEnabled", false)
 
+        val required_pass_length = sp.getInt("minPass", 0)
+        val current_pass_length = sp.getInt("currPassLength", 0)
+
         findViewById<TextView>(R.id.tv_bio_required).text = bio_required.toString()
         findViewById<TextView>(R.id.tv_bio_current).text = isBioAuth.toString()
+        findViewById<TextView>(R.id.tv_minPass_required).text = required_pass_length.toString()
+        findViewById<TextView>(R.id.tv_minPass_current).text = current_pass_length.toString()
+
 
     }
 }

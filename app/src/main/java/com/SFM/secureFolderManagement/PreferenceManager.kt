@@ -78,7 +78,7 @@ class PreferenceManager(sp: SharedPreferences){
         editor.putString("usergroup", usergroup)
         editor.putString("companyID", companyID)
         editor.putBoolean("requireEncryption", requireEncryption)
-        editor.putBoolean("requireBiometris", requireBiometrics)
+        editor.putBoolean("requireBiometrics", requireBiometrics)
         editor.putString("pinType", pinType)
         editor.putInt("pinMaxTries", pinMaxTries)
         editor.putInt("pinLockoutTime", pinLockoutTime)
