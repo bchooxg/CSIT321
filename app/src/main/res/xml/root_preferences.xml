@@ -1,11 +1,13 @@
-<PreferenceScreen xmlns:app="http://schemas.android.com/apk/res-auto">
+<PreferenceScreen xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:android="http://schemas.android.com/apk/res/android">
 
     <PreferenceCategory app:title="Current Password">
 
-        <EditTextPreference
-            app:key="password"
-            app:title="Password"
-            app:useSimpleSummaryProvider="true" />
+        <Preference
+            app:key="change_pin"
+            app:title="Change Password">
+
+        </Preference>
 
     </PreferenceCategory>
 
