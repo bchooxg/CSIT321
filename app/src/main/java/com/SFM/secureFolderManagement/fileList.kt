@@ -652,9 +652,11 @@ class fileList : AppCompatActivity() {
 
         if (flag ){
             Log.v("TEST", "Compliant")
+            loggingManager.insertLog("Device Compliant")
             icon.setImageResource(R.drawable.ic_baseline_check_24_green)
         }else{
             Log.v("TEST", "Not Compliant")
+            loggingManager.insertLog("Device Non Compliant")
             icon.setImageResource(R.drawable.ic_baseline_do_not_disturb_24)
         }
     }
