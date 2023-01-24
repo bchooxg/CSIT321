@@ -11,25 +11,25 @@ import com.SFM.secureFolderManagement.entities.LogEntity
 interface LogDAO {
 
     @Query("SELECT * FROM log")
-    suspend fun getAllLogs(): List<LogEntity>
+    fun getAllLogs(): List<LogEntity>
 
     @Query("SELECT * FROM log WHERE username = :username")
-    suspend fun getLogsByUsername(username: String): List<LogEntity>
+     fun getLogsByUsername(username: String): List<LogEntity>
 
     @Query("SELECT * FROM log WHERE fileName = :fileName")
-    suspend fun getLogsByFileName(fileName: String): List<LogEntity>
+     fun getLogsByFileName(fileName: String): List<LogEntity>
 
     @Query("SELECT * FROM log WHERE status = :status")
-    suspend fun getLogsByStatus(status: String): List<LogEntity>
+     fun getLogsByStatus(status: String): List<LogEntity>
 
     @Insert
-    suspend fun insertLog(log: LogEntity)
+     fun insertLog(log: LogEntity)
 
     @Delete
-    suspend fun deleteLog(log: LogEntity)
+     fun deleteLog(log: LogEntity)
 
     @Query("DELETE FROM log")
-    suspend fun deleteAllLogs()
+     fun deleteAllLogs()
 
     @Query("UPDATE log set status = :newStatus WHERE status = 'New'")
     fun updateLogsStatus(newStatus: String)

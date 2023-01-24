@@ -11,8 +11,8 @@ android {
         applicationId "com.SFM.secureFolderManagement"
         minSdk 23
         targetSdk 32
-        versionCode 1
-        versionName "1.0"
+        versionCode 2
+        versionName "2.0"
 
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
     }
@@ -34,6 +34,7 @@ android {
     kotlinOptions {
         jvmTarget = '1.8'
     }
+    namespace 'com.SFM.secureFolderManagement'
     buildFeatures {
         viewBinding true
     }
