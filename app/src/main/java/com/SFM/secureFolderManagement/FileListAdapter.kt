@@ -134,7 +134,11 @@ class FileListAdapter(files: ArrayList<File>?, fileList: fileList) : RecyclerVie
 
     }
 
+
     override fun getItemCount(): Int {
+        if (files == null) {
+            return 0
+        }
         return files!!.size
     }
 

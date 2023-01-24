@@ -342,7 +342,6 @@ class fileList : AppCompatActivity() {
             }
         }
 
-        //checkEmpty()
 
         recyclerView.layoutManager = androidx.recyclerview.widget.LinearLayoutManager(this)
         recyclerView.adapter = FileListAdapter(files, this)
@@ -476,11 +475,11 @@ class fileList : AppCompatActivity() {
     fun refreshRecyclerView() {
         val recyclerView = findViewById<RecyclerView>(R.id.rvFilesList)
         val path = intent.getStringExtra("path").toString()
-        val files = File(path).listFiles()?.toCollection(ArrayList())
+        var files = File(path).listFiles()?.toCollection(ArrayList())
 
         // check if there are files in the directory
         val textView = findViewById<TextView>(R.id.tvNoText)
-        if (files?.size == 0) {
+        if (files?.size == 0 || files == null) {
             textView.visibility = TextView.VISIBLE
         } else {
             textView.visibility = TextView.INVISIBLE
