@@ -1,7 +1,7 @@
 package com.SFM.secureFolderManagement
 
 import android.content.Intent
-import android.content.Context
+import android.net.Uri
 import android.os.Bundle
 import androidx.appcompat.app.ActionBar
 import androidx.appcompat.app.AppCompatActivity
@@ -35,8 +35,8 @@ class SettingsFragment : PreferenceFragmentCompat() {
         setPreferencesFromResource(R.xml.root_preferences, rootKey)
 
         // to send user to pin code activity
-        val preference: Preference? = findPreference("change_pin")
-        preference?.setOnPreferenceClickListener {
+        val changePinPreference: Preference? = findPreference("change_pin")
+        changePinPreference?.setOnPreferenceClickListener {
             context?.let { it1 -> getDefaultSharedPreferences(it1).edit().putBoolean("isPinSet", false).apply() }
             val intent = Intent(context, PasswordActivity::class.java)
             startActivity(intent)
@@ -44,12 +44,21 @@ class SettingsFragment : PreferenceFragmentCompat() {
         }
 
         // to send user to compliance checker activity
-        val preference2: Preference? = findPreference("check_compliance")
-        preference2?.setOnPreferenceClickListener {
+        val compliancePreference: Preference? = findPreference("check_compliance")
+        compliancePreference?.setOnPreferenceClickListener {
             val intent = Intent(context, ComplianceChecker::class.java)
             startActivity(intent)
             true
         }
+
+        // To send user to the web page to change their account password
+        val changePasswordPreference : Preference? = findPreference("change_password")
+        changePasswordPreference?.setOnPreferenceClickListener {
+            val browserIntent = Intent(Intent.ACTION_VIEW, Uri.parse("https://securefolderwebserver.onrender.com/api/users/changePassword"))
+            startActivity(browserIntent)
+            true
+        }
+
 
 
     }

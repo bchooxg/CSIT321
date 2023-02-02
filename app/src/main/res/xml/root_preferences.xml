@@ -5,9 +5,15 @@
 
         <Preference
             app:key="change_pin"
-            app:title="Change Password">
+            app:title="Change Pin">
 
         </Preference>
+        <Preference
+            app:key="change_password"
+            app:title="Change Account Password">
+
+        </Preference>
+
 
     </PreferenceCategory>
 
