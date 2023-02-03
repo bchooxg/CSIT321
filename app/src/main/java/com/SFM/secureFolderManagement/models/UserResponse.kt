@@ -11,4 +11,5 @@ data class UserResponse(
     val pin_type: String,
     val pin_max_tries: Int,
     val pin_lockout_time: Int,
+    val is_locked : Boolean
 )

@@ -181,7 +181,7 @@ class PasswordActivity : AppCompatActivity() {
             var username = sp.getString("username", "")
             var isLocked = sp.getBoolean("isLocked", false)
             val pinLength = sp.getInt("currPassLength", 4)
-            pollUserDetails(username.toString())
+            pollUserDetails(username.toString(), circleField, errMsg )
 
             // create biometric prompt
             if( isBioAuthEnabled){
@@ -337,7 +337,7 @@ class PasswordActivity : AppCompatActivity() {
     }
 
     // function that sends a request to server to poll the user and update current status
-    fun pollUserDetails(username: String){
+    fun pollUserDetails(username: String, circleField: PinField, errMsg : TextView){
         Log.v("TEST", "Inside Poll User Details")
         val apiInterface = ServiceBuilder.buildService(ApiInterface::class.java)
         val requestCall = apiInterface.pollUserDetails(username)
@@ -359,6 +359,13 @@ class PasswordActivity : AppCompatActivity() {
                             putInt("pinMaxTries", res.pin_max_tries)
                             putInt("pinLockOutTime", res.pin_lockout_time)
                             putInt("minPass", res.min_pass)
+                            putBoolean("isLocked", res.is_locked)
+                            if(res.is_locked){
+                                // User is locked, Disable the pin field
+                                circleField.isEnabled = false
+                                errMsg.visibility = TextView.VISIBLE
+                                errMsg.text = "Account Locked. Please ask your administrator to unlock your account."
+                            }
                             commit()
                         }
                         // todo add compliance check or update state

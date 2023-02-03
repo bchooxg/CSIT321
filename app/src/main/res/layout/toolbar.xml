@@ -8,5 +8,13 @@
     android:theme="@style/ThemeOverlay.AppCompat.Dark.ActionBar"
     app:title="@string/long_app_name"
     app:popupTheme="@style/ThemeOverlay.AppCompat.Light">
+    <ImageView
+        android:id="@+id/iv_compliance_icon"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:contentDescription="complianceIcon"
+        android:src="@drawable/ic_baseline_check_24_green" />
+        />
+
 
 </androidx.appcompat.widget.Toolbar>

@@ -24,6 +24,7 @@ import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.widget.Toolbar
 import androidx.core.content.FileProvider
+import androidx.preference.PreferenceManager.getDefaultSharedPreferences
 import androidx.recyclerview.widget.RecyclerView
 import androidx.security.crypto.EncryptedFile
 import androidx.security.crypto.MasterKey
@@ -246,7 +247,8 @@ class fileList : AppCompatActivity() {
         val toolbar = findViewById<Toolbar>(R.id.toolbar)
         setSupportActionBar(toolbar)
 
-
+        // Check and update compliance
+        checkAndUpdateCompliance()
 
         // Create launcher
         intentSenderLauncher =
@@ -340,7 +342,6 @@ class fileList : AppCompatActivity() {
             }
         }
 
-        //checkEmpty()
 
         recyclerView.layoutManager = androidx.recyclerview.widget.LinearLayoutManager(this)
         recyclerView.adapter = FileListAdapter(files, this)
@@ -474,11 +475,11 @@ class fileList : AppCompatActivity() {
     fun refreshRecyclerView() {
         val recyclerView = findViewById<RecyclerView>(R.id.rvFilesList)
         val path = intent.getStringExtra("path").toString()
-        val files = File(path).listFiles()?.toCollection(ArrayList())
+        var files = File(path).listFiles()?.toCollection(ArrayList())
 
         // check if there are files in the directory
         val textView = findViewById<TextView>(R.id.tvNoText)
-        if (files?.size == 0) {
+        if (files?.size == 0 || files == null) {
             textView.visibility = TextView.VISIBLE
         } else {
             textView.visibility = TextView.INVISIBLE
@@ -625,6 +626,38 @@ class fileList : AppCompatActivity() {
                 show()
             }
 
+    }
+
+    fun checkAndUpdateCompliance(){
+        val icon = findViewById<ImageView>(R.id.iv_compliance_icon)
+
+
+        val sp = getDefaultSharedPreferences(this)
+
+
+        var flag = true
+
+        val minPass = sp.getInt("minPass", 0)
+        val currPassLength = sp.getInt("currPassLength", 0)
+        if( minPass != currPassLength){
+            flag = false
+        }
+
+        val requireBiometrics = sp.getBoolean("requireBiometrics", false)
+        val isBioAuthEnabled = sp.getBoolean("isBioAuthEnabled", false)
+        if (requireBiometrics != isBioAuthEnabled){
+            flag = false
+        }
+
+        if (flag ){
+            Log.v("TEST", "Compliant")
+            loggingManager.insertLog("Device Compliant")
+            icon.setImageResource(R.drawable.ic_baseline_check_24_green)
+        }else{
+            Log.v("TEST", "Not Compliant")
+            loggingManager.insertLog("Device Non Compliant")
+            icon.setImageResource(R.drawable.ic_baseline_do_not_disturb_24)
+        }
     }
 
 
