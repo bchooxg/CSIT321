@@ -1,7 +1,7 @@
 # CSIT321
 CSIT-22-S4-22 ( Topic )  FYP-22-S4-13P ( Grp Number )
 
-Steps to launch local build 
+# Steps to launch local build 
 
 ( Github )
 1. Open android studio
