@@ -54,7 +54,7 @@ class SettingsFragment : PreferenceFragmentCompat() {
         // To send user to the web page to change their account password
         val changePasswordPreference : Preference? = findPreference("change_password")
         changePasswordPreference?.setOnPreferenceClickListener {
-            val browserIntent = Intent(Intent.ACTION_VIEW, Uri.parse("https://securefolderwebserver.onrender.com/api/users/changePassword"))
+            val browserIntent = Intent(Intent.ACTION_VIEW, Uri.parse("https://securefolderwebserver.onrender.com/changePassword"))
             startActivity(browserIntent)
             true
         }

@@ -59,7 +59,6 @@ class FileListAdapter(files: ArrayList<File>?, fileList: fileList) : RecyclerVie
             popup.menu.add("Delete")
 //            popup.menu.add("Move")
             popup.menu.add("Rename")
-            popup.menu.add("Encrypt")
 
             popup.setOnMenuItemClickListener { item ->
                 when (item.title) {
