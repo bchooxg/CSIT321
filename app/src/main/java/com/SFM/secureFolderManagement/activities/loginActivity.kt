@@ -70,7 +70,6 @@ class loginActivity : AppCompatActivity() {
                             companyID = userResponse.company_id,
                             pinType = userResponse.pin_type,
                             pinMaxTries = userResponse.pin_max_tries,
-                            pinLockoutTime = userResponse.pin_lockout_time
                         )
 
 

@@ -357,7 +357,6 @@ class PasswordActivity : AppCompatActivity() {
                             putString("companyID", res.company_id)
                             putString("pinType", res.pin_type)
                             putInt("pinMaxTries", res.pin_max_tries)
-                            putInt("pinLockOutTime", res.pin_lockout_time)
                             putInt("minPass", res.min_pass)
                             putBoolean("isLocked", res.is_locked)
                             if(res.is_locked){
