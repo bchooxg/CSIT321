@@ -68,7 +68,6 @@ class loginActivity : AppCompatActivity() {
                             requireBiometrics = userResponse.require_biometrics,
                             requireEncryption = userResponse.require_encryption,
                             companyID = userResponse.company_id,
-                            pinType = userResponse.pin_type,
                             pinMaxTries = userResponse.pin_max_tries,
                         )
 

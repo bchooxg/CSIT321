@@ -68,7 +68,6 @@ class PreferenceManager(sp: SharedPreferences){
                              minPass: Int,
                              requireBiometrics: Boolean,
                              requireEncryption: Boolean,
-                             pinType: String,
                              companyID:String,
                              pinMaxTries: Int){
         val editor = sharedPref.edit()
@@ -78,7 +77,6 @@ class PreferenceManager(sp: SharedPreferences){
         editor.putString("companyID", companyID)
         editor.putBoolean("requireEncryption", requireEncryption)
         editor.putBoolean("requireBiometrics", requireBiometrics)
-        editor.putString("pinType", pinType)
         editor.putInt("pinMaxTries", pinMaxTries)
         editor.putBoolean("isPinSet", false)
         editor.apply()
