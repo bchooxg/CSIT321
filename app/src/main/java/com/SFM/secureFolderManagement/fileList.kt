@@ -31,7 +31,6 @@ import androidx.security.crypto.MasterKey
 import androidx.security.crypto.MasterKeys
 import androidx.security.crypto.MasterKeys.AES256_GCM_SPEC
 import com.SFM.secureFolderManagement.activities.loginActivity
-import com.SFM.secureFolderManagement.R
 import com.google.android.material.floatingactionbutton.FloatingActionButton
 import java.io.ByteArrayOutputStream
 import java.io.File
@@ -421,15 +420,42 @@ class fileList : AppCompatActivity() {
         return tempUri;
     }
 
+    fun decryptFile(context: Context, target: File, extension: String): Uri? {
+        val mainKey = MasterKey.Builder(context)
+            .setKeyScheme(MasterKey.KeyScheme.AES256_GCM)
+            .build()
+
+        val file = EncryptedFile.Builder(
+            context,
+            target, mainKey, EncryptedFile.FileEncryptionScheme.AES256_GCM_HKDF_4KB
+        )
+            .build()
+
+        val stream: InputStream = file.openFileInput()
+
+        val tempUri = initTempUri()
+        val outputStream = contentResolver.openOutputStream(tempUri)
+        outputStream?.write(stream.readBytes())
+        outputStream?.close()
+        return tempUri
+
+    }
+
     private fun saveBitmapToUri(bitmap: Bitmap?, tempUri: Uri) {
         val outputStream = contentResolver.openOutputStream(tempUri)
         bitmap?.compress(Bitmap.CompressFormat.JPEG, 100, outputStream)
         outputStream?.close()
     }
 
+    private fun getFileExtension(filename: String): String? {
+        val lastDotIndex = filename.lastIndexOf('.')
+        return if (lastDotIndex == -1) null else filename.substring(lastDotIndex + 1)
+    }
+    @RequiresApi(Build.VERSION_CODES.O)
     fun openFile(uri: Uri?) {
         // Check extension of file
-        val extension = MimeTypeMap.getFileExtensionFromUrl(uri.toString())
+//        val extension = MimeTypeMap.getFileExtensionFromUrl(uri.toString())
+        val extension = getFileExtension(uri.toString())
         Log.v("TEST", "Extension: $extension")
 
         loggingManager.insertLog("Open File", fileName = uri.toString())
@@ -438,7 +464,7 @@ class fileList : AppCompatActivity() {
         val encryptionFlag = filename?.startsWith("E_")
         Log.v("TEST", "Encryption Flag: $encryptionFlag")
 
-        if (extension == "jpg" || extension == "png") {
+        if (extension == "jpg" || extension == "png" || extension == "jpeg" || extension == "bmp" || extension == "webp" || extension == "gif") {
 
             val intent = Intent(Intent.ACTION_VIEW)
 
@@ -456,16 +482,137 @@ class fileList : AppCompatActivity() {
             intent.setDataAndType(uri, "image/*")
             startActivity(intent)
         }
-//        val intent = Intent(Intent.ACTION_VIEW)
-//        var type = "image/*"
-//        intent.setDataAndType(uri, type)
-//        intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
-//        try {
-//            startActivity(intent)
-//        } catch (e: Exception) {
-//            // Make toast
-//            Toast.makeText(this, "No app found to open this file", Toast.LENGTH_SHORT).show()
-//        }
+        if (extension == "mp4") {
+            val intent = Intent(Intent.ACTION_VIEW)
+            var decryptedUri = uri
+            if (encryptionFlag == true) {
+                // decrypt image
+                decryptedUri = decryptFile(this, File(uri.path.toString()), extension)
+
+            }
+            intent.setDataAndType(decryptedUri, "video/*")
+            intent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
+            intent.addFlags(Intent.FLAG_GRANT_WRITE_URI_PERMISSION)
+            return startActivity(intent)
+        }
+        if (extension == "mp3") {
+            val intent = Intent(Intent.ACTION_VIEW)
+            var decryptedUri = uri
+            if (encryptionFlag == true) {
+                // decrypt image
+                decryptedUri = decryptFile(this, File(uri.path.toString()), extension)
+
+            }
+            intent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
+            intent.addFlags(Intent.FLAG_GRANT_WRITE_URI_PERMISSION)
+            intent.setDataAndType(decryptedUri, "audio/*")
+            return startActivity(intent)
+        }
+        if (extension == "pdf") {
+            val intent = Intent(Intent.ACTION_VIEW)
+            var decryptedUri = uri
+            if (encryptionFlag == true) {
+                // decrypt image
+                decryptedUri = decryptFile(this, File(uri.path.toString()), extension)
+
+            }
+            intent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
+            intent.addFlags(Intent.FLAG_GRANT_WRITE_URI_PERMISSION)
+            intent.setDataAndType(decryptedUri, "application/pdf")
+            return startActivity(intent)
+        }
+        if (extension == "txt") {
+            val intent = Intent(Intent.ACTION_VIEW)
+            var decryptedUri = uri
+            if (encryptionFlag == true) {
+                // decrypt image
+                decryptedUri = decryptFile(this, File(uri.path.toString()), extension)
+
+            }
+            intent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
+            intent.addFlags(Intent.FLAG_GRANT_WRITE_URI_PERMISSION)
+            intent.setDataAndType(decryptedUri, "text/plain")
+            return startActivity(intent)
+        }
+        if (extension == "doc" || extension == "docx") {
+            val intent = Intent(Intent.ACTION_VIEW)
+            var decryptedUri = uri
+            if (encryptionFlag == true) {
+                // decrypt image
+                decryptedUri = decryptFile(this, File(uri.path.toString()), extension)
+
+            }
+            intent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
+            intent.addFlags(Intent.FLAG_GRANT_WRITE_URI_PERMISSION)
+            intent.setDataAndType(decryptedUri, "application/msword")
+            return startActivity(intent)
+        }
+        if (extension == "xls" || extension == "xlsx") {
+            val intent = Intent(Intent.ACTION_VIEW)
+            var decryptedUri = uri
+            if (encryptionFlag == true) {
+                // decrypt image
+                decryptedUri = decryptFile(this, File(uri.path.toString()), extension)
+
+            }
+            intent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
+            intent.addFlags(Intent.FLAG_GRANT_WRITE_URI_PERMISSION)
+            intent.setDataAndType(decryptedUri, "application/vnd.ms-excel")
+            return startActivity(intent)
+        }
+        if (extension == "ppt" || extension == "pptx") {
+            val intent = Intent(Intent.ACTION_VIEW)
+            var decryptedUri = uri
+            if (encryptionFlag == true) {
+                // decrypt image
+                decryptedUri = decryptFile(this, File(uri.path.toString()), extension)
+
+            }
+            intent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
+            intent.addFlags(Intent.FLAG_GRANT_WRITE_URI_PERMISSION)
+            intent.setDataAndType(decryptedUri, "application/vnd.ms-powerpoint")
+            return startActivity(intent)
+        }
+        if (extension == "zip" || extension == "rar") {
+            val intent = Intent(Intent.ACTION_VIEW)
+            var decryptedUri = uri
+            if (encryptionFlag == true) {
+                // decrypt image
+                decryptedUri = decryptFile(this, File(uri.path.toString()), extension)
+
+            }
+            intent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
+            intent.addFlags(Intent.FLAG_GRANT_WRITE_URI_PERMISSION)
+            intent.setDataAndType(decryptedUri, "application/zip")
+            return startActivity(intent)
+        }
+        if (extension == "html") {
+            val intent = Intent(Intent.ACTION_VIEW)
+            var decryptedUri = uri
+            if (encryptionFlag == true) {
+                // decrypt image
+                decryptedUri = decryptFile(this, File(uri.path.toString()), extension)
+
+            }
+            intent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
+            intent.addFlags(Intent.FLAG_GRANT_WRITE_URI_PERMISSION)
+            intent.setDataAndType(decryptedUri, "text/html")
+            return startActivity(intent)
+        }
+        if (extension == "apk") {
+            val intent = Intent(Intent.ACTION_VIEW)
+            var decryptedUri = uri
+            if (encryptionFlag == true) {
+                // decrypt image
+                decryptedUri = decryptFile(this, File(uri.path.toString()), extension)
+
+            }
+            intent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
+            intent.addFlags(Intent.FLAG_GRANT_WRITE_URI_PERMISSION)
+            intent.setDataAndType(decryptedUri, "application/vnd.android.package-archive")
+            return startActivity(intent)
+        }
+
     }
 
 
@@ -682,11 +829,31 @@ class URIPathHelper {
 
             } else if (isDownloadsDocument(uri)) {
                 val id = DocumentsContract.getDocumentId(uri)
-                val contentUri = ContentUris.withAppendedId(
-                    Uri.parse("content://downloads/public_downloads"),
-                    java.lang.Long.valueOf(id)
-                )
-                return getDataColumn(context, contentUri, null, null)
+//                val contentUri = ContentUris.withAppendedId(
+//                    Uri.parse("content://downloads/public_downloads"),
+//                    java.lang.Long.valueOf(id)
+//                )
+//                return getDataColumn(context, contentUri, null, null)
+                return if (id.startsWith("raw:")) {
+                    id.replaceFirst("raw:".toRegex(), "")
+                } else if (id.startsWith("msf:")){
+
+                    val split = id.split(":".toRegex()).toTypedArray()
+                    val type = split[0]
+                    val contentUri = ContentUris.withAppendedId(
+                        Uri.parse("content://downloads/public_downloads"),
+                        java.lang.Long.valueOf(split[1])
+                    )
+                    getDataColumn(context, contentUri, null, null)
+
+                } else {
+                    val contentUri = ContentUris.withAppendedId(
+                        Uri.parse("content://downloads/public_downloads"),
+                        java.lang.Long.valueOf(id)
+                    )
+                    getDataColumn(context, contentUri, null, null)
+                }
+
             } else if (isMediaDocument(uri)) {
                 val docId = DocumentsContract.getDocumentId(uri)
                 val split = docId.split(":".toRegex()).toTypedArray()
