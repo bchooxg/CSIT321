@@ -454,8 +454,7 @@ class fileList : AppCompatActivity() {
     @RequiresApi(Build.VERSION_CODES.O)
     fun openFile(uri: Uri?) {
         // Check extension of file
-//        val extension = MimeTypeMap.getFileExtensionFromUrl(uri.toString())
-        val extension = getFileExtension(uri.toString())
+        val extension = getFileExtension(uri.toString())?.lowercase()
         Log.v("TEST", "Extension: $extension")
 
         loggingManager.insertLog("Open File", fileName = uri.toString())

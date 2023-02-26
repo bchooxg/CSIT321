@@ -157,7 +157,7 @@ class FileListAdapter(files: ArrayList<File>?, fileList: fileList) : RecyclerVie
             fileName!!.text = file.name
 
             // get file type
-            val fileType = file.name.substring(file.name.lastIndexOf(".") + 1)
+            val fileType = file.name.substring(file.name.lastIndexOf(".") + 1).lowercase()
 
             if (file.isDirectory) {
                 fileIcon!!.setImageResource(R.drawable.ic_baseline_folder_24)
