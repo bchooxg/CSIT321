@@ -114,18 +114,58 @@ class fileList : AppCompatActivity() {
     private val storageLauncher =
         registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
             if (result.resultCode == Activity.RESULT_OK) {
-                // Create intent to go to file list
-                Log.v("TEST", "Storage activity started")
-                val uri = result.data?.data
-                Log.v("TEST", "URI: $uri")
 
-                // Get file path from uri
-                val URIPathHelper = URIPathHelper()
-                val filePath = URIPathHelper.getPath(this, uri!!)
-                Log.v("TEST", "File Path: $filePath")
-                filePath?.let { File(it) }?.let { saveEncryptedFile(it) }
+                val builder = AlertDialog.Builder(this)
+                builder.setTitle("Move file to Secure Folder")
+                builder.setMessage("Moving to secure folder will delete file from device and cannot be undone. Continue?")
+                builder.setPositiveButton("Yes") { dialog, which ->
 
-                refreshRecyclerView()
+                    // Create intent to go to file list
+                    Log.v("TEST", "Storage activity started")
+                    val uri = result.data?.data
+                    Log.v("TEST", "URI: $uri")
+
+                    // Get file path from uri
+                    val URIPathHelper = URIPathHelper()
+                    val filePath = URIPathHelper.getPath(this, uri!!)
+                    Log.v("TEST", "File Path: $filePath")
+                    filePath?.let { File(it) }?.let { saveEncryptedFile(it) }
+
+                    // delete file
+                    val fileToBeDeleted = File(filePath)
+                    if (fileToBeDeleted.delete()) {
+                        Log.v("TEST", "File deleted")
+                    } else {
+                        Log.v("TEST", "File not deleted")
+                    }
+
+                    // Notify media scanner of deleted file
+                    val mediaScanIntent = Intent(Intent.ACTION_MEDIA_SCANNER_SCAN_FILE)
+                    val contentUri = Uri.fromFile(fileToBeDeleted)
+                    mediaScanIntent.data = contentUri
+                    this.sendBroadcast(mediaScanIntent)
+
+                    refreshRecyclerView()
+                }
+                builder.setNegativeButton("No") { dialog, which ->
+                    // close dialog
+                    dialog.dismiss()
+                }
+                builder.show()
+
+
+//                // Create intent to go to file list
+//                Log.v("TEST", "Storage activity started")
+//                val uri = result.data?.data
+//                Log.v("TEST", "URI: $uri")
+//
+//                // Get file path from uri
+//                val URIPathHelper = URIPathHelper()
+//                val filePath = URIPathHelper.getPath(this, uri!!)
+//                Log.v("TEST", "File Path: $filePath")
+//                filePath?.let { File(it) }?.let { saveEncryptedFile(it) }
+//
+//                refreshRecyclerView()
             }
         }
 
